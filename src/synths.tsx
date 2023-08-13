@@ -30,7 +30,6 @@ export const makeLeadSynth = () => {
   const newLeadSynth = new Tone.PolySynth(Tone.Synth, {
     volume: -4,
     oscillator: {
-      partials: [1, 2, 5],
       type: "sawtooth",
     },
     portamento: 0.005,
@@ -59,5 +58,6 @@ export const makeRhythmSynth = () => {
       release: 0.7,
     },
   });
+
   return newRhythmSynth;
 };
