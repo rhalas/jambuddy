@@ -25,15 +25,19 @@ function App() {
 
   const [progression, setProgression] = useState<Array<string>>([]);
   const [melody, setMelody] = useState<Array<MelodyPiece>>([]);
+  const [initApp, setInitApp] = useState<boolean>(false);
 
   useEffect(() => {
-    setRhythmSynth(makeRhythmSynth());
-    setLeadSynth(makeLeadSynth());
-    setSnare(makeSnareDrum());
-    setBass(makeBassDrum());
-  }, []);
+    if (initApp) {
+      setRhythmSynth(makeRhythmSynth());
+      setLeadSynth(makeLeadSynth());
+      setSnare(makeSnareDrum());
+      setBass(makeBassDrum());
+    }
+  }, [initApp]);
 
   const generateNewProgression = () => {
+    setInitApp(true);
     const songInfo = makeRandomProgression();
     setProgression(songInfo.chordProgression);
     setMelody(songInfo.melody);
