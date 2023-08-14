@@ -1,13 +1,12 @@
-import { NoteTypes, MelodyPiece, SongInfo } from "./types";
+import { ChordTypes, NoteTypes, MelodyPiece, SongInfo } from "./types";
 
-export const chords: NoteTypes = {
-  I: ["C3", "E3", "G4"],
-  ii: ["D3", "F3", "A4"],
-  iii: ["E3", "G3", "B4"],
-  IV: ["F3", "A4", "C4"],
-  V: ["G3", "B4", "D4"],
-  vi: ["A4", "C4", "E4"],
-  vii: ["C3"],
+export const chords: ChordTypes = {
+  I: { chordName: "C", notes: ["C3", "E3", "G4"] },
+  ii: { chordName: "Dm", notes: ["D3", "F3", "A4"] },
+  iii: { chordName: "Em", notes: ["E3", "G3", "B4"] },
+  IV: { chordName: "F", notes: ["F3", "A4", "C4"] },
+  V: { chordName: "G", notes: ["G3", "B4", "D4"] },
+  vi: { chordName: "Am", notes: ["A4", "C4", "E4"] },
 };
 
 export const scaleNotes: NoteTypes = {
@@ -21,25 +20,28 @@ export const makeRandomProgression = (): SongInfo => {
     progression.push(chordKeys[Math.floor(Math.random() * chordKeys.length)]);
   }
 
-  const beatLocations: Array<string> = [];
-
+  const melodyBeats: Array<number> = [];
   let totalBeats = 0;
   while (totalBeats < 15) {
     totalBeats += Math.floor(Math.random() * 3) + 1;
     if (totalBeats >= 16) {
       totalBeats = 15;
     }
-    beatLocations.push(`+${Math.floor(totalBeats / 4)}:${totalBeats % 4}`);
+    melodyBeats.push(totalBeats);
   }
 
   const randomMelodyNotes: Array<string> = [];
   const notes = scaleNotes["C"];
   const melody: Array<MelodyPiece> = [];
-  for (let i = 0; i < beatLocations.length; i++) {
+  for (let i = 0; i < melodyBeats.length; i++) {
     const note = notes[Math.floor(Math.random() * notes.length)];
     const octave = Math.floor(Math.random() * 3) + 2;
     randomMelodyNotes.push(`${note}${octave}`);
-    melody.push({ note: `${note}${octave}`, beat: beatLocations[i] });
+    melody.push({
+      note: `${note}${octave}`,
+      beat: `+${Math.floor(melodyBeats[i] / 4)}:${melodyBeats[i] % 4}`,
+      beatNumber: melodyBeats[i],
+    });
   }
 
   return { chordProgression: progression, melody: melody };

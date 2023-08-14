@@ -1,7 +1,17 @@
 export type MelodyPiece = {
   note: string;
   beat: string;
+  beatNumber: number;
 };
+
+export type ChordInfo = {
+  chordName: string;
+  notes: Array<string>;
+};
+
+export interface ChordTypes {
+  [key: string]: ChordInfo;
+}
 
 export interface NoteTypes {
   [key: string]: Array<string>;

@@ -30,6 +30,7 @@ const Square = styled.div<{ $isActive: boolean }>`
   margin-top: 10px;
   margin-right: 10px;
   background-color: #555;
+  color: chartreuse;
   ${(props) =>
     props.$isActive ? "background-color: blue;" : "background-color: gray;"}
 `;
@@ -44,7 +45,6 @@ function App() {
   const [melody, setMelody] = useState<Array<MelodyPiece>>([]);
   const [initApp, setInitApp] = useState<boolean>(false);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
-  const [beatOptions, setBeatOptions] = useState<Array<number>>([]);
   const [beatInfo, setBeatInfo] = useState<Array<BeatInfo>>([]);
 
   useEffect(() => {
@@ -62,9 +62,8 @@ function App() {
       for (let i = 0; i <= 15; i++) {
         beats.push(i);
       }
-      setBeatOptions(beats);
     }
-  }, [initApp, setBeatOptions]);
+  }, [initApp]);
 
   useEffect(() => {}, [melody]);
 
@@ -73,6 +72,24 @@ function App() {
     const songInfo = makeRandomProgression();
     setProgression(songInfo.chordProgression);
     setMelody(songInfo.melody);
+
+    const chordBeats: Array<BeatInfo> = new Array<BeatInfo>(NUMBER_OF_BEATS);
+    for (let i = 0; i < NUMBER_OF_BEATS; i++) {
+      chordBeats[i] = { beatNumber: i, rhythm: "" } as BeatInfo;
+    }
+
+    for (let i = 0; i < songInfo.chordProgression.length; i++) {
+      chordBeats[i * 4].rhythm = chords[songInfo.chordProgression[i]].chordName;
+    }
+
+    const leadBeats: Array<BeatInfo> = new Array<BeatInfo>(NUMBER_OF_BEATS);
+    for (let i = 0; i < NUMBER_OF_BEATS; i++) {
+      leadBeats[i] = { beatNumber: i, lead: "" } as BeatInfo;
+    }
+
+    for (let i = 0; i < songInfo.melody.length; i++) {
+      leadBeats[songInfo.melody[i].beatNumber].lead = songInfo.melody[i].note;
+    }
 
     const bassBeats = makeBassDrumLoop();
     const snareBeats = makeSnareLoop();
@@ -84,6 +101,8 @@ function App() {
       newBeatInfo[i].beatNumber = i;
       newBeatInfo[i].bassDrum = bassBeats[i].bassDrum;
       newBeatInfo[i].snareDrum = snareBeats[i].snareDrum;
+      newBeatInfo[i].lead = leadBeats[i].lead;
+      newBeatInfo[i].rhythm = chordBeats[i].rhythm;
     }
 
     setBeatInfo(newBeatInfo);
@@ -99,7 +118,7 @@ function App() {
     const chordProgression: Array<Array<string>> = [];
     progression?.map((chord: string) => {
       const chordNotes = chords[chord];
-      chordProgression.push(chordNotes);
+      chordProgression.push(chordNotes.notes);
     });
 
     makeRhythmLoop(rhythmSynth!, chordProgression);
@@ -117,17 +136,48 @@ function App() {
   return (
     <>
       <div>
-        <div>
-          {progression && progression.map((chord) => chord).join(" - ")}
-        </div>
-        <div>{melody && melody.map((note) => note.note).join(" - ")}</div>
-        <button onClick={generateNewProgression}>Make Progression</button>
-        <button onClick={playProgression}>Play Progression</button>
+        {beatInfo.length === 0 ? (
+          <button onClick={generateNewProgression}>Make Progression</button>
+        ) : (
+          <>
+            <div>
+              Chord Progression:{" "}
+              {progression && progression.map((chord) => chord).join(" - ")}
+            </div>
+            <button onClick={playProgression}>Play Progression</button>
+          </>
+        )}
       </div>
       <Beats>
         {beatInfo.map((beat) => {
           return (
             <Square $isActive={beat.beatNumber === beatNumber % 16}> </Square>
+          );
+        })}
+      </Beats>
+      <Beats>
+        {beatInfo.map((beat) => {
+          return (
+            <Square
+              $isActive={
+                beat.beatNumber === beatNumber % 16 && beat.rhythm !== ""
+              }
+            >
+              {beat.rhythm}
+            </Square>
+          );
+        })}
+      </Beats>
+      <Beats>
+        {beatInfo.map((beat) => {
+          return (
+            <Square
+              $isActive={
+                beat.beatNumber === beatNumber % 16 && beat.lead !== ""
+              }
+            >
+              {beat.lead}
+            </Square>
           );
         })}
       </Beats>
