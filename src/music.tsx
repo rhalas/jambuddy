@@ -7,6 +7,7 @@ export const chords: NoteTypes = {
   IV: ["F3", "A4", "C4"],
   V: ["G3", "B4", "D4"],
   vi: ["A4", "C4", "E4"],
+  vii: ["C3"],
 };
 
 export const scaleNotes: NoteTypes = {

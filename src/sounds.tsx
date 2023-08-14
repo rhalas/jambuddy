@@ -1,7 +1,38 @@
 import * as Tone from "tone";
-import { MelodyPiece } from "./types";
+import { MelodyPiece, BeatInfo, NUMBER_OF_BEATS } from "./types";
 
-export const makeSnareLoop = (snare: Tone.NoiseSynth) => {
+export const makeSnareLoop = (): Array<BeatInfo> => {
+  const beats = new Array<BeatInfo>(NUMBER_OF_BEATS);
+  for (let i = 0; i < NUMBER_OF_BEATS; i++) {
+    beats[i] = { beatNumber: i, snareDrum: "" } as BeatInfo;
+  }
+
+  beats[1].snareDrum = "S";
+  beats[3].snareDrum = "S";
+  beats[5].snareDrum = "S";
+  beats[7].snareDrum = "S";
+  beats[9].snareDrum = "S";
+  beats[11].snareDrum = "S";
+  beats[13].snareDrum = "S";
+  beats[15].snareDrum = "S";
+
+  return beats;
+};
+
+export const playBassDrumLoop = (bassDrum: Tone.MembraneSynth) => {
+  new Tone.Loop(() => {
+    bassDrum!.triggerAttackRelease("C2", "8n", "+0:0");
+    bassDrum!.triggerAttackRelease("C2", "8n", "+0:2");
+    bassDrum!.triggerAttackRelease("C2", "8n", "+1:0");
+    bassDrum!.triggerAttackRelease("C2", "8n", "+1:2");
+    bassDrum!.triggerAttackRelease("C2", "8n", "+2:0");
+    bassDrum!.triggerAttackRelease("C2", "8n", "+2:2");
+    bassDrum!.triggerAttackRelease("C2", "8n", "+3:0");
+    bassDrum!.triggerAttackRelease("C2", "8n", "+3:2");
+  }, "4m").start(0);
+};
+
+export const playSnareDrumLoop = (snare: Tone.NoiseSynth) => {
   new Tone.Loop(() => {
     snare!.triggerAttackRelease("8n", "+0:1");
     snare!.triggerAttackRelease("8n", "+0:3");
@@ -14,17 +45,21 @@ export const makeSnareLoop = (snare: Tone.NoiseSynth) => {
   }, "4m").start(0);
 };
 
-export const makeBassDrumLoop = (bassDrum: Tone.MembraneSynth) => {
-  new Tone.Loop(() => {
-    bassDrum!.triggerAttackRelease("C2", "8n", "+0:0");
-    bassDrum!.triggerAttackRelease("C2", "8n", "+0:2");
-    bassDrum!.triggerAttackRelease("C2", "8n", "+1:0");
-    bassDrum!.triggerAttackRelease("C2", "8n", "+1:2");
-    bassDrum!.triggerAttackRelease("C2", "8n", "+2:0");
-    bassDrum!.triggerAttackRelease("C2", "8n", "+2:2");
-    bassDrum!.triggerAttackRelease("C2", "8n", "+3:0");
-    bassDrum!.triggerAttackRelease("C2", "8n", "+3:2");
-  }, "4m").start(0);
+export const makeBassDrumLoop = (): Array<BeatInfo> => {
+  const beats = new Array<BeatInfo>(NUMBER_OF_BEATS);
+  for (let i = 0; i < NUMBER_OF_BEATS; i++) {
+    beats[i] = { beatNumber: i, bassDrum: "" } as BeatInfo;
+  }
+  beats[0].bassDrum = "B";
+  beats[2].bassDrum = "B";
+  beats[4].bassDrum = "B";
+  beats[6].bassDrum = "B";
+  beats[8].bassDrum = "B";
+  beats[10].bassDrum = "B";
+  beats[12].bassDrum = "B";
+  beats[14].bassDrum = "B";
+
+  return beats;
 };
 
 export const makeRhythmLoop = (
