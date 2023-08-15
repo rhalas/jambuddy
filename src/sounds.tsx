@@ -85,3 +85,37 @@ export const makeMelodyLoop = (
     }
   }, "4m").start(0);
 };
+
+export const makeBassLoop = (
+  bassSynth: Tone.PolySynth,
+  chords: Array<Array<string>>
+) => {
+  const bassBeats = new Array<BeatInfo>();
+
+  for (let bar = 0; bar < 4; bar++) {
+    bassBeats.push({
+      lead: `+${bar}:0`,
+      bass: `${chords[bar][0].charAt(0)}1`,
+      beatNumber: bar * 4,
+    } as BeatInfo);
+    for (let beat = 1; beat <= 3; beat++) {
+      if (Math.floor(Math.random() * 3) == 1) {
+        const randomNote =
+          chords[bar][Math.floor(Math.random() * chords[0].length)];
+        bassBeats.push({
+          lead: `+${bar}:${beat}`,
+          bass: `${randomNote.charAt(0)}1`,
+          beatNumber: bar * 4 + beat,
+        } as BeatInfo);
+      }
+    }
+  }
+
+  new Tone.Loop(() => {
+    bassBeats.map((bassBeat) => {
+      bassSynth!.triggerAttackRelease(bassBeat.bass, "8n", bassBeat.lead);
+    });
+  }, "4m").start(0);
+
+  return bassBeats;
+};

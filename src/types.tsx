@@ -34,6 +34,17 @@ export type BeatInfo = {
   lead: string;
   bassDrum: string;
   snareDrum: string;
+  bass: string;
+};
+
+export type Beat = {
+  beatNumber: number;
+  beatData: string;
+};
+
+export type TrackData = {
+  beats: Array<Beat>;
+  name: string;
 };
 
 export const NUMBER_OF_BEATS = 16;

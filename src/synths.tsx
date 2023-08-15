@@ -47,17 +47,43 @@ export const makeLeadSynth = () => {
 export const makeRhythmSynth = () => {
   const newRhythmSynth = new Tone.PolySynth(Tone.Synth).toDestination();
   newRhythmSynth.set({
+    volume: -6,
     oscillator: {
-      type: "sine5",
-      volume: -6,
+      type: "fatsine",
     },
     envelope: {
-      attack: 0.1,
-      decay: 0.4,
-      sustain: 0.3,
-      release: 0.7,
+      attack: 0.2,
+      decay: 0.1,
+      sustain: 1,
+      release: 1,
     },
+    portamento: 0.2,
   });
 
+  const reverb = new Tone.Reverb({
+    decay: 10.0,
+    preDelay: 0.01,
+  }).toDestination();
+  newRhythmSynth.connect(reverb);
+
   return newRhythmSynth;
+};
+
+export const makeBassSynth = () => {
+  const newBassSynth = new Tone.PolySynth(Tone.Synth, {
+    volume: -4,
+    oscillator: {
+      type: "sawtooth",
+    },
+  }).toDestination();
+
+  const tremolo = new Tone.Tremolo({
+    frequency: 10,
+    type: "sine",
+    depth: 0.5,
+    spread: 180,
+  }).toDestination();
+  newBassSynth.connect(tremolo);
+
+  return newBassSynth;
 };
