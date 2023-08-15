@@ -78,7 +78,6 @@ function App() {
       for (let i = 0; i <= 15; i++) {
         newBeats.push({ beatNumber: i, beatData: "T" });
       }
-      setEmptyBeats(newBeats);
       const newTrack = { name: "Metronome", beats: newBeats } as TrackData;
       setTracks([newTrack]);
     }
