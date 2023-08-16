@@ -47,17 +47,10 @@ export const makeLeadSynth = () => {
 export const makeRhythmSynth = () => {
   const newRhythmSynth = new Tone.PolySynth(Tone.Synth).toDestination();
   newRhythmSynth.set({
-    volume: -6,
+    volume: -5,
     oscillator: {
       type: "fatsine",
     },
-    envelope: {
-      attack: 0.2,
-      decay: 0.1,
-      sustain: 1,
-      release: 1,
-    },
-    portamento: 0.2,
   });
 
   const reverb = new Tone.Reverb({
@@ -71,7 +64,7 @@ export const makeRhythmSynth = () => {
 
 export const makeBassSynth = () => {
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -4,
+    volume: -6,
     oscillator: {
       type: "sawtooth",
     },

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Beat, TrackData } from "./types";
+import { NUMBER_OF_BEATS, TrackData } from "./types";
 
 type TrackProps = {
   trackData: TrackData;
@@ -16,6 +16,7 @@ const InstrumentLabel = styled.div`
   display: flex;
   align-items: center;
   margin-right: 10px;
+  width: 100px;
 `;
 
 const Beats = styled.div`
@@ -41,7 +42,14 @@ export const Track = (trackProps: TrackProps) => {
       <Beats>
         {trackData.beats.map((beat) => {
           return (
-            <Square $isActive={beat.beatNumber === currentBeat % 16}> </Square>
+            <Square
+              $isActive={Boolean(
+                beat.beatNumber === currentBeat % NUMBER_OF_BEATS &&
+                  (beat.label || trackData.name === "Beat")
+              )}
+            >
+              {beat.label}
+            </Square>
           );
         })}
       </Beats>
