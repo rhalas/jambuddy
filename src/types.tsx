@@ -23,6 +23,7 @@ export type SongInfo = {
   bassTrack: TrackData;
   snareDrumTrack: TrackData;
   guitarRhythmTrack: TrackData;
+  progression: Array<ChordInfo>;
 };
 
 export type Measure = {
