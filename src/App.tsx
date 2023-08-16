@@ -10,7 +10,7 @@ import {
 } from "./synths";
 import { NUMBER_OF_BEATS, TrackData } from "./types";
 import { makeTrackLoop } from "./sounds";
-import { makeRandomProgression, chordUrls } from "./music";
+import { makeRandomProgression } from "./music";
 import { Sequencer } from "./sequencer";
 import { makeNewTrack } from "./utils";
 
