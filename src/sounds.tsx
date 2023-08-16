@@ -27,6 +27,15 @@ export const makeTrackLoop = (synth: TrackSynth, beats: Array<Beat>) => {
             beat.length,
             `+${bar}:${measure}`
           );
+        } else if (synth.samplePlayers) {
+          if (beat.label) {
+            const currentPlayer = synth.samplePlayers[beat.label];
+            currentPlayer.start(
+              `+${bar}:${measure}`,
+              0,
+              `+${bar + 1}:${measure}`
+            );
+          }
         }
       }
     });

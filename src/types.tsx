@@ -22,6 +22,7 @@ export type SongInfo = {
   bassDrumTrack: TrackData;
   bassTrack: TrackData;
   snareDrumTrack: TrackData;
+  guitarRhythmTrack: TrackData;
 };
 
 export type Measure = {
@@ -46,10 +47,15 @@ export type Beat = {
   length: string;
 };
 
+export interface SamplePlayers {
+  [key: string]: Tone.Player;
+}
+
 export type TrackSynth = {
   polySynth?: Tone.PolySynth;
   membraneSynth?: Tone.MembraneSynth;
   noiseSynth?: Tone.NoiseSynth;
+  samplePlayers?: SamplePlayers;
 };
 
 export type TrackData = {
@@ -57,6 +63,10 @@ export type TrackData = {
   name: string;
   synth: TrackSynth;
 };
+
+export interface ChordUrl {
+  [key: string]: string;
+}
 
 export const BEATS_PER_BAR = 4;
 export const NUMBER_OF_BEATS = 16;

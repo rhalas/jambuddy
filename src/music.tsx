@@ -5,6 +5,7 @@ import {
   NUMBER_OF_BARS,
   BEATS_PER_BAR,
   TrackData,
+  ChordUrl,
 } from "./types";
 import { makeNewTrack } from "./utils";
 import * as Tone from "tone";
@@ -22,7 +23,16 @@ export const scaleNotes: NoteTypes = {
   C: ["C", "D", "E", "F", "G", "A", "B", "C"],
 };
 
-export const generatedRandomProgression = (): Array<ChordInfo> => {
+export const chordUrls: ChordUrl = {
+  Am: "https://jambuddy.s3.amazonaws.com/a_minor.m4a",
+  C: "https://jambuddy.s3.amazonaws.com/c_major.m4a",
+  Dm: "https://jambuddy.s3.amazonaws.com/d_minor.m4a",
+  Em: "https://jambuddy.s3.amazonaws.com/e_minor.m4a",
+  F: "https://jambuddy.s3.amazonaws.com/f_major.m4a",
+  G: "https://jambuddy.s3.amazonaws.com/g_major.m4a",
+};
+
+const generatedRandomProgression = (): Array<ChordInfo> => {
   const chordProgression: Array<ChordInfo> = [];
   for (let i = 0; i < NUMBER_OF_BARS; i++) {
     const randomChord = chords[Math.floor(Math.random() * chords.length)];
@@ -40,7 +50,7 @@ export const generateRhythmTrack = (
   chordProgression: Array<ChordInfo>,
   synth: Tone.PolySynth
 ): TrackData => {
-  const newRhythmTrack = makeNewTrack("Rhythm", { polySynth: synth });
+  const newRhythmTrack = makeNewTrack("Pads", { polySynth: synth });
   let currChordPos = 0;
   for (
     let beatNumber = 0;
@@ -68,7 +78,7 @@ export const generateRhythmTrack = (
   return newRhythmTrack;
 };
 
-export const generateMelodyTrack = (
+const generateMelodyTrack = (
   songKey: string,
   synth: Tone.PolySynth
 ): TrackData => {
@@ -107,7 +117,7 @@ export const generateBassDrumTrack = (synth: Tone.MembraneSynth): TrackData => {
   return newBassDrumTrack;
 };
 
-export const generateSnareDrumTrack = (synth: Tone.NoiseSynth): TrackData => {
+const generateSnareDrumTrack = (synth: Tone.NoiseSynth): TrackData => {
   const newSnareDrumTrack = makeNewTrack("Snare Drum", { noiseSynth: synth });
   for (let i = 0; i < newSnareDrumTrack.beats.length; i++) {
     if (i % 2 === 1) {
@@ -119,7 +129,7 @@ export const generateSnareDrumTrack = (synth: Tone.NoiseSynth): TrackData => {
   return newSnareDrumTrack;
 };
 
-export const generateBassTrack = (
+const generateBassTrack = (
   synth: Tone.PolySynth,
   rhythmTrack: TrackData
 ): TrackData => {
@@ -157,20 +167,42 @@ export const generateBassTrack = (
   return newBassTrack;
 };
 
-export const makeRandomProgression = (
+const generateGuitarRhythmTrack = async (
+  progression: Array<ChordInfo>
+): Promise<TrackData> => {
+  const newGuitarRhythmTrack = makeNewTrack("Guitar", {});
+  const chordsToFetch = progression.map((p) => p.chordName);
+  newGuitarRhythmTrack.synth.samplePlayers = {};
+
+  for (let i = 0; i < chordsToFetch.length; i++) {
+    const newPlayer = new Tone.Player().toDestination();
+    await newPlayer.load(chordUrls[chordsToFetch[i]]);
+    newPlayer.volume.value = -7;
+
+    const measureToPlay = i * BEATS_PER_BAR;
+    newGuitarRhythmTrack.beats[measureToPlay].label = chordsToFetch[i];
+    newGuitarRhythmTrack.beats[measureToPlay].length = "8n";
+    newGuitarRhythmTrack.synth.samplePlayers[chordsToFetch[i]] = newPlayer;
+  }
+
+  return newGuitarRhythmTrack;
+};
+
+export const makeRandomProgression = async (
   songKey: string,
   rhythmSynth: Tone.PolySynth,
   leadSynth: Tone.PolySynth,
   bassSynth: Tone.PolySynth,
   bassDrumSynth: Tone.MembraneSynth,
   snareDrumSynth: Tone.NoiseSynth
-): SongInfo => {
+): Promise<SongInfo> => {
   const progression = generatedRandomProgression();
   const rhythmTrack = generateRhythmTrack(progression, rhythmSynth);
   const melodyTrack = generateMelodyTrack(songKey, leadSynth);
   const bassDrumTrack = generateBassDrumTrack(bassDrumSynth);
   const snareDrumTrack = generateSnareDrumTrack(snareDrumSynth);
   const bassTrack = generateBassTrack(bassSynth, rhythmTrack);
+  const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
 
   return {
     rhythmTrack: rhythmTrack,
@@ -178,5 +210,6 @@ export const makeRandomProgression = (
     bassDrumTrack: bassDrumTrack,
     bassTrack: bassTrack,
     snareDrumTrack: snareDrumTrack,
+    guitarRhythmTrack: guitarRhythmTrack,
   };
 };

@@ -28,7 +28,7 @@ export const makeBassDrum = () => {
 
 export const makeLeadSynth = () => {
   const newLeadSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -4,
+    volume: -3,
     oscillator: {
       type: "sawtooth",
     },
@@ -47,7 +47,7 @@ export const makeLeadSynth = () => {
 export const makeRhythmSynth = () => {
   const newRhythmSynth = new Tone.PolySynth(Tone.Synth).toDestination();
   newRhythmSynth.set({
-    volume: -5,
+    volume: -2,
     oscillator: {
       type: "fatsine",
     },
@@ -64,7 +64,7 @@ export const makeRhythmSynth = () => {
 
 export const makeBassSynth = () => {
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -6,
+    volume: -3,
     oscillator: {
       type: "sawtooth",
     },

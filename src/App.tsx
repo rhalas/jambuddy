@@ -10,7 +10,7 @@ import {
 } from "./synths";
 import { NUMBER_OF_BEATS, TrackData } from "./types";
 import { makeTrackLoop } from "./sounds";
-import { makeRandomProgression } from "./music";
+import { makeRandomProgression, chordUrls } from "./music";
 import { Sequencer } from "./sequencer";
 import { makeNewTrack } from "./utils";
 
@@ -53,26 +53,31 @@ function App() {
 
   useEffect(() => {
     if (readyToGenerateProgression) {
-      const songInfo = makeRandomProgression(
-        songKey,
-        rhythmSynth!,
-        leadSynth!,
-        bassSynth!,
-        bassDrum!,
-        snareDrum!
-      );
-      const metronomeTrack = makeNewTrack("Beat");
+      const getSongInfo = async () => {
+        const songInfo = await makeRandomProgression(
+          songKey,
+          rhythmSynth!,
+          leadSynth!,
+          bassSynth!,
+          bassDrum!,
+          snareDrum!
+        );
+        const metronomeTrack = makeNewTrack("Beat");
 
-      const newTracks = [
-        metronomeTrack,
-        songInfo.rhythmTrack,
-        songInfo.melodyTrack,
-        songInfo.bassTrack,
-        songInfo.bassDrumTrack,
-        songInfo.snareDrumTrack,
-      ];
+        const newTracks = [
+          metronomeTrack,
+          songInfo.rhythmTrack,
+          songInfo.guitarRhythmTrack,
+          songInfo.melodyTrack,
+          songInfo.bassTrack,
+          songInfo.bassDrumTrack,
+          songInfo.snareDrumTrack,
+        ];
 
-      setTracks(newTracks);
+        setTracks(newTracks);
+      };
+
+      getSongInfo();
     }
   }, [readyToGenerateProgression]);
 
@@ -80,13 +85,12 @@ function App() {
     setCreateAudioContexts(true);
   };
 
-  const playProgression = () => {
+  const playProgression = async () => {
     tracks.forEach((track) => {
       if (track.synth) {
         makeTrackLoop(track.synth, track.beats);
       }
     });
-
     Tone.Transport.start();
   };
 
