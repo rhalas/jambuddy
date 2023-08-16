@@ -211,5 +211,6 @@ export const makeRandomProgression = async (
     bassTrack: bassTrack,
     snareDrumTrack: snareDrumTrack,
     guitarRhythmTrack: guitarRhythmTrack,
+    progression: progression,
   };
 };

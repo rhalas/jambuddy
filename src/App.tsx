@@ -8,7 +8,7 @@ import {
   makeRhythmSynth,
   makeBassSynth,
 } from "./synths";
-import { NUMBER_OF_BEATS, TrackData } from "./types";
+import { ChordInfo, NUMBER_OF_BEATS, TrackData } from "./types";
 import { makeTrackLoop } from "./sounds";
 import { makeRandomProgression } from "./music";
 import { Sequencer } from "./sequencer";
@@ -20,6 +20,7 @@ function App() {
   const [snareDrum, setSnareDrum] = useState<Tone.NoiseSynth>();
   const [bassDrum, setBassDrum] = useState<Tone.MembraneSynth>();
   const [bassSynth, setBassSynth] = useState<Tone.PolySynth>();
+  const [progression, setProgression] = useState<Array<ChordInfo>>([]);
 
   const [beatNumber, setBeatNumber] = useState<number>(-1);
   const [tracks, setTracks] = useState<Array<TrackData>>([]);
@@ -75,6 +76,7 @@ function App() {
         ];
 
         setTracks(newTracks);
+        setProgression(songInfo.progression);
       };
 
       getSongInfo();
@@ -101,7 +103,11 @@ function App() {
           <button onClick={generateNewProgression}>Make Progression</button>
         ) : (
           <>
-            <div>Chord Progression: </div>
+            <div>
+              Chord Progression:
+              {progression &&
+                progression.map((p: ChordInfo) => p.position).join(" - ")}
+            </div>
             <button onClick={playProgression}>Play Progression</button>
           </>
         )}
