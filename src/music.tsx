@@ -35,7 +35,15 @@ export const chordUrls: ChordUrl = {
 const generatedRandomProgression = (): Array<ChordInfo> => {
   const chordProgression: Array<ChordInfo> = [];
   for (let i = 0; i < NUMBER_OF_BARS; i++) {
-    const randomChord = chords[Math.floor(Math.random() * chords.length)];
+    let randomChord = chords[Math.floor(Math.random() * chords.length)];
+    if (chordProgression.length >= 1) {
+      while (
+        randomChord.position ===
+        chordProgression[chordProgression.length - 1].position
+      ) {
+        randomChord = chords[Math.floor(Math.random() * chords.length)];
+      }
+    }
     chordProgression.push({
       position: randomChord.position,
       chordName: randomChord.chordName,
