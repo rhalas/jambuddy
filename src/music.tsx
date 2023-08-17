@@ -192,6 +192,7 @@ const generateBassTrack = (
   return newBassTrack;
 };
 
+/*
 const generateGuitarRhythmTrack = async (
   progression: Array<ChordInfo>
 ): Promise<TrackData> => {
@@ -215,6 +216,7 @@ const generateGuitarRhythmTrack = async (
 
   return newGuitarRhythmTrack;
 };
+*/
 
 const generateScaleNotes = (songKey: KeyInfo) => {
   const rootPosition = notes.indexOf(songKey.rootNote);
