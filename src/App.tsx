@@ -8,9 +8,9 @@ import {
   makeRhythmSynth,
   makeBassSynth,
 } from "./synths";
-import { ChordInfo, NUMBER_OF_BEATS, TrackData } from "./types";
+import { ChordInfo, NUMBER_OF_BEATS, TrackData, KeyInfo } from "./types";
 import { makeTrackLoop } from "./sounds";
-import { makeRandomProgression } from "./music";
+import { makeRandomProgression, notes, progressions } from "./music";
 import { Sequencer } from "./sequencer";
 import { makeNewTrack } from "./utils";
 
@@ -21,10 +21,11 @@ function App() {
   const [bassDrum, setBassDrum] = useState<Tone.MembraneSynth>();
   const [bassSynth, setBassSynth] = useState<Tone.PolySynth>();
   const [progression, setProgression] = useState<Array<ChordInfo>>([]);
+  const [songReady, setSongReady] = useState<boolean>(false);
 
   const [beatNumber, setBeatNumber] = useState<number>(-1);
   const [tracks, setTracks] = useState<Array<TrackData>>([]);
-  const [songKey] = useState<string>("C");
+  const [songKey, setSongKey] = useState<KeyInfo | undefined>();
 
   const [readyToGenerateProgression, setReadyToGenerateProgression] =
     useState<boolean>(false);
@@ -53,7 +54,7 @@ function App() {
   }, [createAudioContexts]);
 
   useEffect(() => {
-    if (readyToGenerateProgression) {
+    if (readyToGenerateProgression && songKey) {
       const getSongInfo = async () => {
         const songInfo = await makeRandomProgression(
           songKey,
@@ -68,7 +69,6 @@ function App() {
         const newTracks = [
           metronomeTrack,
           songInfo.rhythmTrack,
-          songInfo.guitarRhythmTrack,
           songInfo.melodyTrack,
           songInfo.bassTrack,
           songInfo.bassDrumTrack,
@@ -77,38 +77,54 @@ function App() {
 
         setTracks(newTracks);
         setProgression(songInfo.progression);
+        setSongReady(true);
       };
 
       getSongInfo();
     }
-  }, [readyToGenerateProgression]);
+  }, [readyToGenerateProgression, songKey]);
 
   const generateNewProgression = () => {
+    const rootNote = notes[Math.floor(Math.random() * notes.length)];
+    const listOfProgressions = Object.keys(progressions);
+    const newProgression =
+      listOfProgressions[Math.floor(Math.random() * listOfProgressions.length)];
+    const newSongKey = {
+      rootNote: rootNote,
+      progression: newProgression,
+    };
+    setSongKey(newSongKey);
     setCreateAudioContexts(true);
   };
 
-  const playProgression = async () => {
-    tracks.forEach((track) => {
-      if (track.synth) {
-        makeTrackLoop(track.synth, track.beats);
-      }
-    });
-    Tone.Transport.start();
-  };
+  useEffect(() => {
+    if (songReady) {
+      tracks.forEach((track) => {
+        if (track.synth) {
+          makeTrackLoop(track.synth, track.beats);
+        }
+      });
+      Tone.Transport.start();
+    }
+  }, [songReady, tracks]);
 
   return (
     <>
       <div>
         {tracks.length === 0 ? (
-          <button onClick={generateNewProgression}>Make Progression</button>
+          <button onClick={generateNewProgression}>Play a song</button>
         ) : (
           <>
             <div>
-              Chord Progression:
-              {progression &&
-                progression.map((p: ChordInfo) => p.position).join(" - ")}
+              <div>
+                Key: {songKey?.rootNote} {songKey?.progression}
+              </div>
+              <div>
+                Chord Progression:{" "}
+                {progression &&
+                  progression.map((p: ChordInfo) => p.position).join(" - ")}
+              </div>
             </div>
-            <button onClick={playProgression}>Play Progression</button>
           </>
         )}
       </div>

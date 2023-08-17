@@ -1,26 +1,40 @@
 import {
   ChordInfo,
-  NoteTypes,
   SongInfo,
   NUMBER_OF_BARS,
   BEATS_PER_BAR,
   TrackData,
   ChordUrl,
+  KeyInfo,
+  Scales,
+  Progressions,
 } from "./types";
 import { makeNewTrack } from "./utils";
 import * as Tone from "tone";
 
-export const chords: Array<ChordInfo> = [
-  { position: "I", chordName: "C", notes: ["C3", "E3", "G4"] },
-  { position: "ii", chordName: "Dm", notes: ["D3", "F3", "A4"] },
-  { position: "iii", chordName: "Em", notes: ["E3", "G3", "B4"] },
-  { position: "IV", chordName: "F", notes: ["F3", "A4", "C4"] },
-  { position: "V", chordName: "G", notes: ["G3", "B4", "D4"] },
-  { position: "vi", chordName: "Am", notes: ["A4", "C4", "E4"] },
+export const notes: Array<string> = [
+  "Ab",
+  "A",
+  "Bb",
+  "B",
+  "C",
+  "Db",
+  "D",
+  "Eb",
+  "E",
+  "F",
+  "Gb",
+  "G",
 ];
 
-export const scaleNotes: NoteTypes = {
-  C: ["C", "D", "E", "F", "G", "A", "B", "C"],
+export const scales: Scales = {
+  Major: [0, 2, 2, 1, 2, 2, 2],
+  Minor: [0, 2, 1, 2, 2, 1, 2],
+};
+
+export const progressions: Progressions = {
+  Major: ["I", "ii", "iii", "IV", "V", "vi", "VII°"],
+  Minor: ["i", "ii°", "III", "iv", "v", "VI", "VII"],
 };
 
 export const chordUrls: ChordUrl = {
@@ -32,16 +46,20 @@ export const chordUrls: ChordUrl = {
   G: "https://jambuddy.s3.amazonaws.com/g_major.m4a",
 };
 
-const generatedRandomProgression = (): Array<ChordInfo> => {
+const generatedRandomProgression = (
+  chordDetails: Array<ChordInfo>
+): Array<ChordInfo> => {
   const chordProgression: Array<ChordInfo> = [];
   for (let i = 0; i < NUMBER_OF_BARS; i++) {
-    let randomChord = chords[Math.floor(Math.random() * chords.length)];
+    let randomChord =
+      chordDetails[Math.floor(Math.random() * chordDetails.length)];
     if (chordProgression.length >= 1) {
       while (
         randomChord.position ===
         chordProgression[chordProgression.length - 1].position
       ) {
-        randomChord = chords[Math.floor(Math.random() * chords.length)];
+        randomChord =
+          chordDetails[Math.floor(Math.random() * chordDetails.length)];
       }
     }
     chordProgression.push({
@@ -87,11 +105,10 @@ export const generateRhythmTrack = (
 };
 
 const generateMelodyTrack = (
-  songKey: string,
-  synth: Tone.PolySynth
+  synth: Tone.PolySynth,
+  scaleNotes: Array<string>
 ): TrackData => {
   const newMelodyTrack = makeNewTrack("Melody", { polySynth: synth });
-  const notes = scaleNotes[songKey];
 
   for (
     let beatNumber = 0;
@@ -99,7 +116,7 @@ const generateMelodyTrack = (
     beatNumber++
   ) {
     if (Math.floor(Math.random() * 2) == 1) {
-      const note = notes[Math.floor(Math.random() * notes.length)];
+      const note = scaleNotes[Math.floor(Math.random() * scaleNotes.length)];
       const octave = Math.floor(Math.random() * 3) + 2;
       const newNote = `${note}${octave}`;
 
@@ -184,33 +201,99 @@ const generateGuitarRhythmTrack = async (
 
   for (let i = 0; i < chordsToFetch.length; i++) {
     const newPlayer = new Tone.Player().toDestination();
-    await newPlayer.load(chordUrls[chordsToFetch[i]]);
-    newPlayer.volume.value = -7;
+    const listOfChords = Object.keys(chordUrls);
+    if (listOfChords[i].includes(chordsToFetch[i])) {
+      await newPlayer.load(chordUrls[chordsToFetch[i]]);
+      newPlayer.volume.value = -7;
 
-    const measureToPlay = i * BEATS_PER_BAR;
-    newGuitarRhythmTrack.beats[measureToPlay].label = chordsToFetch[i];
-    newGuitarRhythmTrack.beats[measureToPlay].length = "8n";
-    newGuitarRhythmTrack.synth.samplePlayers[chordsToFetch[i]] = newPlayer;
+      const measureToPlay = i * BEATS_PER_BAR;
+      newGuitarRhythmTrack.beats[measureToPlay].label = chordsToFetch[i];
+      newGuitarRhythmTrack.beats[measureToPlay].length = "8n";
+      newGuitarRhythmTrack.synth.samplePlayers[chordsToFetch[i]] = newPlayer;
+    }
   }
 
   return newGuitarRhythmTrack;
 };
 
+const generateScaleNotes = (songKey: KeyInfo) => {
+  const rootPosition = notes.indexOf(songKey.rootNote);
+  const scaleFormula = scales[songKey.progression];
+
+  const notesInScale: Array<string> = [];
+  let totalDelta = rootPosition;
+  scaleFormula.forEach((nextNotePosition) => {
+    totalDelta += nextNotePosition;
+    notesInScale.push(notes[totalDelta % notes.length]);
+  });
+
+  return notesInScale;
+};
+
+const getChordName = (currentPosition: string, rootNote: string) => {
+  let chordName = "";
+  if (currentPosition.charAt(currentPosition.length - 1) === "°") {
+    chordName = `${rootNote}dim`;
+  } else if (currentPosition.charAt(0) === "i") {
+    chordName = `${rootNote}m`;
+  } else {
+    chordName = `${rootNote}`;
+  }
+
+  return chordName;
+};
+
+const generateChordDetails = (
+  scaleNotes: Array<string>,
+  progression: string
+): Array<ChordInfo> => {
+  const selectedProgression = progressions[progression];
+  const chordProgression = [];
+  const defaultNoteOctave = 3;
+
+  for (let i = 0; i < selectedProgression.length; i++) {
+    const chordNotes = [
+      `${scaleNotes[i]}${
+        defaultNoteOctave + Math.floor(i / scaleNotes.length)
+      }`,
+      `${scaleNotes[(i + 2) % scaleNotes.length]}${
+        defaultNoteOctave + Math.floor((i + 2) / scaleNotes.length)
+      }`,
+      `${scaleNotes[(i + 4) % scaleNotes.length]}${
+        defaultNoteOctave + Math.floor((i + 4) / scaleNotes.length)
+      }`,
+    ];
+
+    const chordName = getChordName(selectedProgression[i], scaleNotes[i]);
+
+    chordProgression.push({
+      position: selectedProgression[i],
+      chordName: chordName,
+      notes: chordNotes,
+    });
+  }
+
+  return chordProgression;
+};
+
 export const makeRandomProgression = async (
-  songKey: string,
+  songKey: KeyInfo,
   rhythmSynth: Tone.PolySynth,
   leadSynth: Tone.PolySynth,
   bassSynth: Tone.PolySynth,
   bassDrumSynth: Tone.MembraneSynth,
   snareDrumSynth: Tone.NoiseSynth
 ): Promise<SongInfo> => {
-  const progression = generatedRandomProgression();
+  const scale = generateScaleNotes(songKey);
+  const chordDetails = generateChordDetails(scale, songKey.progression);
+
+  const progression = generatedRandomProgression(chordDetails);
   const rhythmTrack = generateRhythmTrack(progression, rhythmSynth);
-  const melodyTrack = generateMelodyTrack(songKey, leadSynth);
+  const melodyTrack = generateMelodyTrack(leadSynth, scale);
   const bassDrumTrack = generateBassDrumTrack(bassDrumSynth);
   const snareDrumTrack = generateSnareDrumTrack(snareDrumSynth);
   const bassTrack = generateBassTrack(bassSynth, rhythmTrack);
-  const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
+  //const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
 
   return {
     rhythmTrack: rhythmTrack,
@@ -218,7 +301,7 @@ export const makeRandomProgression = async (
     bassDrumTrack: bassDrumTrack,
     bassTrack: bassTrack,
     snareDrumTrack: snareDrumTrack,
-    guitarRhythmTrack: guitarRhythmTrack,
+    guitarRhythmTrack: snareDrumTrack,
     progression: progression,
   };
 };

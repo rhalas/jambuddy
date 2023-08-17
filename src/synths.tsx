@@ -47,7 +47,7 @@ export const makeLeadSynth = () => {
 export const makeRhythmSynth = () => {
   const newRhythmSynth = new Tone.PolySynth(Tone.Synth).toDestination();
   newRhythmSynth.set({
-    volume: -2,
+    volume: 2,
     oscillator: {
       type: "fatsine",
     },

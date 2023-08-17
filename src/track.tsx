@@ -24,11 +24,15 @@ const Beats = styled.div`
 `;
 
 const Square = styled.div<{ $isActive: boolean }>`
-  height: 25px;
-  width: 25px;
+  height: 50px;
+  width: 50px;
   margin-right: 10px;
   background-color: #555;
   color: chartreuse;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px;
+  font-size: 15px;
   ${(props) =>
     props.$isActive ? "background-color: blue;" : "background-color: gray;"}
 `;

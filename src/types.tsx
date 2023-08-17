@@ -69,6 +69,23 @@ export interface ChordUrl {
   [key: string]: string;
 }
 
+export interface Scales {
+  [key: string]: Array<number>;
+}
+
+export interface Progressions {
+  [key: string]: Array<string>;
+}
+
+export interface ChordFormula {
+  [key: string]: Array<number>;
+}
+
+export type KeyInfo = {
+  rootNote: string;
+  progression: string;
+};
+
 export const BEATS_PER_BAR = 4;
 export const NUMBER_OF_BEATS = 16;
 export const NUMBER_OF_BARS = NUMBER_OF_BEATS / BEATS_PER_BAR;
