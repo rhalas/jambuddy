@@ -86,6 +86,14 @@ export type KeyInfo = {
   progression: string;
 };
 
+export type SongSynths = {
+  rhythm: Tone.PolySynth;
+  lead: Tone.PolySynth;
+  snareDrum: Tone.NoiseSynth;
+  bassDrum: Tone.MembraneSynth;
+  bass: Tone.PolySynth;
+};
+
 export const BEATS_PER_BAR = 4;
 export const NUMBER_OF_BEATS = 16;
 export const NUMBER_OF_BARS = NUMBER_OF_BEATS / BEATS_PER_BAR;

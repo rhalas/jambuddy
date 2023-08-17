@@ -8,6 +8,7 @@ import {
   KeyInfo,
   Scales,
   Progressions,
+  SongSynths,
 } from "./types";
 import { makeNewTrack } from "./utils";
 import * as Tone from "tone";
@@ -280,21 +281,17 @@ const generateChordDetails = (
 
 export const makeRandomProgression = async (
   songKey: KeyInfo,
-  rhythmSynth: Tone.PolySynth,
-  leadSynth: Tone.PolySynth,
-  bassSynth: Tone.PolySynth,
-  bassDrumSynth: Tone.MembraneSynth,
-  snareDrumSynth: Tone.NoiseSynth
+  songSynths: SongSynths
 ): Promise<SongInfo> => {
   const scale = generateScaleNotes(songKey);
   const chordDetails = generateChordDetails(scale, songKey.progression);
 
   const progression = generatedRandomProgression(chordDetails);
-  const rhythmTrack = generateRhythmTrack(progression, rhythmSynth);
-  const melodyTrack = generateMelodyTrack(leadSynth, scale);
-  const bassDrumTrack = generateBassDrumTrack(bassDrumSynth);
-  const snareDrumTrack = generateSnareDrumTrack(snareDrumSynth);
-  const bassTrack = generateBassTrack(bassSynth, rhythmTrack);
+  const rhythmTrack = generateRhythmTrack(progression, songSynths.rhythm);
+  const melodyTrack = generateMelodyTrack(songSynths.lead, scale);
+  const bassDrumTrack = generateBassDrumTrack(songSynths.bassDrum);
+  const snareDrumTrack = generateSnareDrumTrack(songSynths.snareDrum);
+  const bassTrack = generateBassTrack(songSynths.bass, rhythmTrack);
   //const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
 
   return {
