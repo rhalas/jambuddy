@@ -97,6 +97,7 @@ function App() {
         }
       });
       setActiveLoops(newLoops);
+      console.log(activeLoops);
       Tone.Transport.start();
     }
   }, [songReady, tracks]);
