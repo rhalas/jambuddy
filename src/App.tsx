@@ -76,6 +76,7 @@ function App() {
         const newTracks = [
           metronomeTrack,
           songInfo.rhythmTrack,
+          songInfo.guitarRhythmTrack,
           songInfo.melodyTrack,
           songInfo.bassTrack,
           songInfo.bassDrumTrack,

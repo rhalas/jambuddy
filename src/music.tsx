@@ -172,8 +172,8 @@ const generateClosedHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
   const newClosedHiHatTrack = makeNewTrack("Closed Hi Hat", {
     noiseSynth: synth,
   });
-  const closedHiHatBeats = [0, 1, 2];
-  for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
+  let closedHiHatBeats = [0, 1, 2];
+  for (let bar = 0; bar < 3; bar++) {
     closedHiHatBeats.forEach((closedHiHatBeat) => {
       const currentBeat = bar * BEATS_PER_BAR + closedHiHatBeat;
       newClosedHiHatTrack.beats[currentBeat].label = "CH";
@@ -183,6 +183,17 @@ const generateClosedHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
       ].triggerTime = `+${bar}:${closedHiHatBeat}`;
     });
   }
+
+  closedHiHatBeats = [0, 2];
+  closedHiHatBeats.forEach((closedHiHatBeat) => {
+    const currentBeat = Math.floor(3 * BEATS_PER_BAR + closedHiHatBeat);
+    newClosedHiHatTrack.beats[currentBeat].label = "CH";
+    newClosedHiHatTrack.beats[currentBeat].length = "8n";
+    newClosedHiHatTrack.beats[
+      currentBeat
+    ].triggerTime = `+${3}:${closedHiHatBeat}`;
+  });
+
   return newClosedHiHatTrack;
 };
 
@@ -190,8 +201,8 @@ const generateOpenHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
   const newOpenHiHatTrack = makeNewTrack("Open Hi Hat", {
     noiseSynth: synth,
   });
-  const closedHiHatBeats = [2.5, 3];
-  for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
+  let closedHiHatBeats = [2.5, 3];
+  for (let bar = 0; bar < 3; bar++) {
     closedHiHatBeats.forEach((closedHiHatBeat) => {
       const currentBeat = Math.floor(bar * BEATS_PER_BAR + closedHiHatBeat);
       newOpenHiHatTrack.beats[currentBeat].label = "OH";
@@ -201,6 +212,17 @@ const generateOpenHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
       ].triggerTime = `+${bar}:${closedHiHatBeat}`;
     });
   }
+
+  closedHiHatBeats = [1, 3];
+  closedHiHatBeats.forEach((closedHiHatBeat) => {
+    const currentBeat = Math.floor(3 * BEATS_PER_BAR + closedHiHatBeat);
+    newOpenHiHatTrack.beats[currentBeat].label = "OH";
+    newOpenHiHatTrack.beats[currentBeat].length = "8n";
+    newOpenHiHatTrack.beats[
+      currentBeat
+    ].triggerTime = `+${3}:${closedHiHatBeat}`;
+  });
+
   return newOpenHiHatTrack;
 };
 
@@ -249,7 +271,6 @@ const generateBassTrack = (
   return newBassTrack;
 };
 
-/*
 const generateGuitarRhythmTrack = async (
   progression: Array<ChordInfo>
 ): Promise<TrackData> => {
@@ -260,9 +281,9 @@ const generateGuitarRhythmTrack = async (
   for (let i = 0; i < chordsToFetch.length; i++) {
     const newPlayer = new Tone.Player().toDestination();
     const listOfChords = Object.keys(chordUrls);
-    if (listOfChords[i].includes(chordsToFetch[i])) {
+    if (listOfChords.includes(chordsToFetch[i])) {
       await newPlayer.load(chordUrls[chordsToFetch[i]]);
-      newPlayer.volume.value = -7;
+      newPlayer.volume.value = -5;
 
       const measureToPlay = i * BEATS_PER_BAR;
       newGuitarRhythmTrack.beats[measureToPlay].label = chordsToFetch[i];
@@ -273,7 +294,6 @@ const generateGuitarRhythmTrack = async (
 
   return newGuitarRhythmTrack;
 };
-*/
 
 const generateScaleNotes = (songKey: KeyInfo) => {
   const rootPosition = notes.indexOf(songKey.rootNote);
@@ -353,7 +373,7 @@ export const makeRandomProgression = async (
   const bassTrack = generateBassTrack(songSynths.bass, rhythmTrack);
   const closedHiHatTrack = generateClosedHiHatTrack(songSynths.closedHiHat);
   const openHiHatTrack = generateOpenHiHatTrack(songSynths.openHiHat);
-  //const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
+  const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
 
   return {
     rhythmTrack: rhythmTrack,
@@ -361,7 +381,7 @@ export const makeRandomProgression = async (
     bassDrumTrack: bassDrumTrack,
     bassTrack: bassTrack,
     snareDrumTrack: snareDrumTrack,
-    guitarRhythmTrack: snareDrumTrack,
+    guitarRhythmTrack: guitarRhythmTrack,
     progression: progression,
     closedHiHatTrack: closedHiHatTrack,
     openHiHatTrack: openHiHatTrack,
