@@ -11,28 +11,25 @@ export const makeTrackLoop = (
   const loop = new Tone.Loop(() => {
     beats.forEach((beat) => {
       if (beat.length) {
-        const bar = Math.floor(beat.beatNumber / BEATS_PER_BAR);
-        const measure = Math.floor(beat.beatNumber % 4);
-
         if (synth.polySynth) {
           synth.polySynth.triggerAttackRelease(
             beat.beatData,
             beat.length,
-            `+${bar}:${measure}`
+            beat.triggerTime
           );
         } else if (synth.membraneSynth) {
           synth.membraneSynth.triggerAttackRelease(
             beat.beatData[0],
             beat.length,
-            `+${bar}:${measure}`
+            beat.triggerTime
           );
         } else if (synth.noiseSynth) {
-          synth.noiseSynth.triggerAttackRelease(
-            beat.length,
-            `+${bar}:${measure}`
-          );
+          synth.noiseSynth.triggerAttackRelease(beat.length, beat.triggerTime);
         } else if (synth.samplePlayers) {
           if (beat.label) {
+            const bar = Math.floor(beat.beatNumber / BEATS_PER_BAR);
+            const measure = Math.floor(beat.beatNumber % 4);
+
             const currentPlayer = synth.samplePlayers[beat.label];
             currentPlayer.start(
               `+${bar}:${measure}`,

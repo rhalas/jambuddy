@@ -64,7 +64,7 @@ export const makeRhythmSynth = () => {
 
 export const makeBassSynth = () => {
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -3,
+    volume: -6,
     oscillator: {
       type: "sawtooth",
     },

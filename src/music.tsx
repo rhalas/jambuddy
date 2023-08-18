@@ -90,6 +90,7 @@ export const generateRhythmTrack = (
         label: chordProgression[currChordPos].chordName,
         beatData: chordProgression[currChordPos].notes,
         length: "1n",
+        triggerTime: `+${Math.floor(beatNumber / BEATS_PER_BAR)}:0`,
       };
       currChordPos += 1;
     } else {
@@ -98,6 +99,7 @@ export const generateRhythmTrack = (
         label: "",
         beatData: [],
         length: "",
+        triggerTime: "",
       };
     }
   }
@@ -118,12 +120,15 @@ const generateMelodyTrack = (
   ) {
     if (Math.floor(Math.random() * 2) == 1) {
       const note = scaleNotes[Math.floor(Math.random() * scaleNotes.length)];
-      const octave = Math.floor(Math.random() * 3) + 2;
+      const octave = Math.floor(Math.random() * 2) + 3;
       const newNote = `${note}${octave}`;
 
       newMelodyTrack.beats[beatNumber].label = newNote;
       newMelodyTrack.beats[beatNumber].beatData = [newNote];
       newMelodyTrack.beats[beatNumber].length = "8n";
+      newMelodyTrack.beats[beatNumber].triggerTime = `+${Math.floor(
+        beatNumber / BEATS_PER_BAR
+      )}:${Math.floor(beatNumber % 4)}`;
     }
   }
 
@@ -137,6 +142,9 @@ export const generateBassDrumTrack = (synth: Tone.MembraneSynth): TrackData => {
       newBassDrumTrack.beats[i].label = "B";
       newBassDrumTrack.beats[i].length = "8n";
       newBassDrumTrack.beats[i].beatData = ["C2"];
+      newBassDrumTrack.beats[i].triggerTime = `+${Math.floor(
+        i / BEATS_PER_BAR
+      )}:${Math.floor(i % 4)}`;
     }
   }
 
@@ -149,6 +157,9 @@ const generateSnareDrumTrack = (synth: Tone.NoiseSynth): TrackData => {
     if (i % 2 === 1) {
       newSnareDrumTrack.beats[i].label = "S";
       newSnareDrumTrack.beats[i].length = "8n";
+      newSnareDrumTrack.beats[i].triggerTime = `+${Math.floor(
+        i / BEATS_PER_BAR
+      )}:${Math.floor(i % 4)}`;
     }
   }
 
@@ -172,20 +183,27 @@ const generateBassTrack = (
     const chordNotes = chords[i];
 
     newBassTrack.beats[i * BEATS_PER_BAR].beatData = [
-      `${chords[i][0].charAt(0)}1`,
+      `${chords[i][0].slice(0, -1)}2`,
     ];
-    newBassTrack.beats[i * BEATS_PER_BAR].label = `${chords[i][0].charAt(0)}1`;
+    newBassTrack.beats[i * BEATS_PER_BAR].label = `${chords[i][0].slice(
+      0,
+      -1
+    )}2`;
     newBassTrack.beats[i * BEATS_PER_BAR].length = "8n";
+    newBassTrack.beats[i * BEATS_PER_BAR].triggerTime = `+${i}:0`;
 
     for (let measure = 1; measure < BEATS_PER_BAR; measure++) {
       if (Math.floor(Math.random() * 3) == 1) {
         const randomNote = `${chordNotes[
           Math.floor(Math.random() * chords[0].length)
-        ].charAt(0)}1`;
+        ].slice(0, -1)}2`;
 
         newBassTrack.beats[i * BEATS_PER_BAR + measure].beatData = [randomNote];
         newBassTrack.beats[i * BEATS_PER_BAR + measure].label = randomNote;
         newBassTrack.beats[i * BEATS_PER_BAR + measure].length = "8n";
+        newBassTrack.beats[
+          i * BEATS_PER_BAR + measure
+        ].triggerTime = `+${i}:${measure}`;
       }
     }
   }

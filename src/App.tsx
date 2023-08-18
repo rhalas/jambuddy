@@ -89,7 +89,7 @@ function App() {
 
   useEffect(() => {
     if (songReady) {
-      const newTempo = Math.floor(Math.random() * (160 - 80 + 1)) + 80;
+      const newTempo = Math.floor(Math.random() * (160 - 100 + 1)) + 100;
       const newLoops: Array<Tone.Loop> = [];
       tracks.forEach((track) => {
         if (track.synth) {

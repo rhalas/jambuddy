@@ -46,6 +46,7 @@ export type Beat = {
   label: string;
   beatData: Array<string>;
   length: string;
+  triggerTime: string;
 };
 
 export interface SamplePlayers {
