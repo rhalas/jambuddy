@@ -24,6 +24,8 @@ export type SongInfo = {
   snareDrumTrack: TrackData;
   guitarRhythmTrack: TrackData;
   progression: Array<ChordInfo>;
+  closedHiHatTrack: TrackData;
+  openHiHatTrack: TrackData;
 };
 
 export type Measure = {
@@ -93,6 +95,8 @@ export type SongSynths = {
   snareDrum: Tone.NoiseSynth;
   bassDrum: Tone.MembraneSynth;
   bass: Tone.PolySynth;
+  closedHiHat: Tone.NoiseSynth;
+  openHiHat: Tone.NoiseSynth;
 };
 
 export const BEATS_PER_BAR = 4;

@@ -7,6 +7,8 @@ import {
   makeLeadSynth,
   makeRhythmSynth,
   makeBassSynth,
+  makeClosedHiHat,
+  makeOpenHiHat,
 } from "./synths";
 import { ChordInfo, TrackData, KeyInfo, SongSynths } from "./types";
 import { makeTrackLoop } from "./sounds";
@@ -51,6 +53,8 @@ function App() {
         snareDrum: makeSnareDrum(),
         bassDrum: makeBassDrum(),
         bass: makeBassSynth(),
+        closedHiHat: makeClosedHiHat(),
+        openHiHat: makeOpenHiHat(),
       };
 
       setSongSynths(newSongSynths);
@@ -76,6 +80,8 @@ function App() {
           songInfo.bassTrack,
           songInfo.bassDrumTrack,
           songInfo.snareDrumTrack,
+          songInfo.closedHiHatTrack,
+          songInfo.openHiHatTrack,
         ];
 
         setTracks(newTracks);
@@ -89,7 +95,7 @@ function App() {
 
   useEffect(() => {
     if (songReady) {
-      const newTempo = Math.floor(Math.random() * (160 - 100 + 1)) + 100;
+      const newTempo = Math.floor(Math.random() * (160 - 120 + 1)) + 120;
       const newLoops: Array<Tone.Loop> = [];
       tracks.forEach((track) => {
         if (track.synth) {

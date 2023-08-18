@@ -22,7 +22,7 @@ export const makeSnareDrum = () => {
 
 export const makeBassDrum = () => {
   return new Tone.MembraneSynth({
-    volume: -2,
+    volume: 3,
   }).toDestination();
 };
 
@@ -79,4 +79,32 @@ export const makeBassSynth = () => {
   newBassSynth.connect(tremolo);
 
   return newBassSynth;
+};
+
+export const makeClosedHiHat = () => {
+  const newHiHatSynth = new Tone.NoiseSynth({
+    volume: -5,
+    envelope: {
+      attack: 0.01,
+      decay: 0.15,
+    },
+  }).connect(lowPass);
+
+  return newHiHatSynth;
+};
+
+export const makeOpenHiHat = () => {
+  const lowPass = new Tone.Filter({
+    frequency: 14000,
+  }).toDestination();
+
+  const openHiHat = new Tone.NoiseSynth({
+    volume: -6,
+    envelope: {
+      attack: 0.01,
+      decay: 0.3,
+    },
+  }).connect(lowPass);
+
+  return openHiHat;
 };
