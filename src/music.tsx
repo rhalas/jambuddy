@@ -313,7 +313,7 @@ const getChordName = (currentPosition: string, rootNote: string) => {
   let chordName = "";
   if (currentPosition.charAt(currentPosition.length - 1) === "°") {
     chordName = `${rootNote}dim`;
-  } else if (currentPosition.charAt(0) === "i") {
+  } else if (["i", "v"].includes(currentPosition.charAt(0))) {
     chordName = `${rootNote}m`;
   } else {
     chordName = `${rootNote}`;
