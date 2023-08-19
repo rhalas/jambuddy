@@ -60,6 +60,8 @@ export type TrackSynth = {
   membraneSynth?: Tone.MembraneSynth;
   noiseSynth?: Tone.NoiseSynth;
   samplePlayers?: SamplePlayers;
+  meter: Tone.Meter;
+  fft: Tone.FFT;
 };
 
 export type TrackData = {
@@ -90,13 +92,13 @@ export type KeyInfo = {
 };
 
 export type SongSynths = {
-  rhythm: Tone.PolySynth;
-  lead: Tone.PolySynth;
-  snareDrum: Tone.NoiseSynth;
-  bassDrum: Tone.MembraneSynth;
-  bass: Tone.PolySynth;
-  closedHiHat: Tone.NoiseSynth;
-  openHiHat: Tone.NoiseSynth;
+  rhythm: TrackSynth;
+  lead: TrackSynth;
+  snareDrum: TrackSynth;
+  bassDrum: TrackSynth;
+  bass: TrackSynth;
+  closedHiHat: TrackSynth;
+  openHiHat: TrackSynth;
 };
 
 export const BEATS_PER_BAR = 4;

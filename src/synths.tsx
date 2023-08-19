@@ -1,11 +1,15 @@
 import * as Tone from "tone";
+import { TrackSynth } from "./types";
 
-const lowPass = new Tone.Filter({
-  frequency: 8000,
-}).toDestination();
+export const makeSnareDrum = (): TrackSynth => {
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
 
-export const makeSnareDrum = () => {
-  return new Tone.NoiseSynth({
+  const lowPass = new Tone.Filter({
+    frequency: 8000,
+  }).toDestination();
+
+  const newSynth = new Tone.NoiseSynth({
     volume: -3,
     noise: {
       type: "white",
@@ -17,23 +21,39 @@ export const makeSnareDrum = () => {
       sustain: 0.15,
       release: 0.03,
     },
-  }).connect(lowPass);
+  })
+    .fan(meter, fft)
+    .connect(lowPass);
+
+  return { noiseSynth: newSynth, meter: meter, fft: fft };
 };
 
-export const makeBassDrum = () => {
-  return new Tone.MembraneSynth({
+export const makeBassDrum = (): TrackSynth => {
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
+
+  const newSynth = new Tone.MembraneSynth({
     volume: 3,
-  }).toDestination();
+  })
+    .fan(meter, fft)
+    .toDestination();
+
+  return { membraneSynth: newSynth, meter: meter, fft: fft };
 };
 
-export const makeLeadSynth = () => {
+export const makeLeadSynth = (): TrackSynth => {
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
+
   const newLeadSynth = new Tone.PolySynth(Tone.Synth, {
     volume: -3,
     oscillator: {
       type: "sawtooth",
     },
     portamento: 0.005,
-  }).toDestination();
+  })
+    .fan(meter, fft)
+    .toDestination();
 
   const reverb = new Tone.Reverb({
     decay: 10.0,
@@ -41,11 +61,16 @@ export const makeLeadSynth = () => {
   }).toDestination();
   newLeadSynth.connect(reverb);
 
-  return newLeadSynth;
+  return { polySynth: newLeadSynth, meter: meter, fft: fft };
 };
 
-export const makeRhythmSynth = () => {
-  const newRhythmSynth = new Tone.PolySynth(Tone.Synth).toDestination();
+export const makeRhythmSynth = (): TrackSynth => {
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
+
+  const newRhythmSynth = new Tone.PolySynth(Tone.Synth)
+    .fan(meter, fft)
+    .toDestination();
   newRhythmSynth.set({
     volume: 2,
     oscillator: {
@@ -59,16 +84,21 @@ export const makeRhythmSynth = () => {
   }).toDestination();
   newRhythmSynth.connect(reverb);
 
-  return newRhythmSynth;
+  return { polySynth: newRhythmSynth, meter: meter, fft: fft };
 };
 
-export const makeBassSynth = () => {
+export const makeBassSynth = (): TrackSynth => {
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
+
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
     volume: -6,
     oscillator: {
       type: "sawtooth",
     },
-  }).toDestination();
+  })
+    .fan(meter, fft)
+    .toDestination();
 
   const tremolo = new Tone.Tremolo({
     frequency: 10,
@@ -78,25 +108,37 @@ export const makeBassSynth = () => {
   }).toDestination();
   newBassSynth.connect(tremolo);
 
-  return newBassSynth;
+  return { polySynth: newBassSynth, meter: meter, fft: fft };
 };
 
-export const makeClosedHiHat = () => {
+export const makeClosedHiHat = (): TrackSynth => {
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
+
+  const lowPass = new Tone.Filter({
+    frequency: 8000,
+  }).toDestination();
+
   const newHiHatSynth = new Tone.NoiseSynth({
     volume: -5,
     envelope: {
       attack: 0.01,
       decay: 0.15,
     },
-  }).connect(lowPass);
+  })
+    .fan(meter, fft)
+    .connect(lowPass);
 
-  return newHiHatSynth;
+  return { noiseSynth: newHiHatSynth, meter: meter, fft: fft };
 };
 
-export const makeOpenHiHat = () => {
+export const makeOpenHiHat = (): TrackSynth => {
   const lowPass = new Tone.Filter({
     frequency: 14000,
   }).toDestination();
+
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
 
   const openHiHat = new Tone.NoiseSynth({
     volume: -6,
@@ -104,7 +146,9 @@ export const makeOpenHiHat = () => {
       attack: 0.01,
       decay: 0.3,
     },
-  }).connect(lowPass);
+  })
+    .fan(meter, fft)
+    .connect(lowPass);
 
-  return openHiHat;
+  return { noiseSynth: openHiHat, meter: meter, fft: fft };
 };

@@ -71,10 +71,9 @@ function App() {
     if (readyToGenerateProgression && songKey && songSynths) {
       const getSongInfo = async () => {
         const songInfo = await makeRandomProgression(songKey, songSynths);
-        const metronomeTrack = makeNewTrack("Beat");
+        //const metronomeTrack = makeNewTrack("Beat");
 
         const newTracks = [
-          metronomeTrack,
           songInfo.rhythmTrack,
           songInfo.guitarRhythmTrack,
           songInfo.melodyTrack,

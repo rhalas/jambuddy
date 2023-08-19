@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { NUMBER_OF_BEATS, TrackData } from "./types";
+import { Visualizer } from "./visualizer";
 
 type TrackProps = {
   trackData: TrackData;
@@ -10,6 +11,7 @@ const TrackContainer = styled.div`
   display: flex;
   align-items: center;
   margin-top: 10px;
+  border-bottom: dashed #03c03c;
 `;
 
 const InstrumentLabel = styled.div`
@@ -39,24 +41,28 @@ const Square = styled.div<{ $isActive: boolean }>`
 
 export const Track = (trackProps: TrackProps) => {
   const { trackData, currentBeat } = trackProps;
+  const beatsEnabaled = false;
 
   return (
     <TrackContainer>
       <InstrumentLabel>{trackData.name}</InstrumentLabel>
-      <Beats>
-        {trackData.beats.map((beat) => {
-          return (
-            <Square
-              $isActive={Boolean(
-                beat.beatNumber === currentBeat % NUMBER_OF_BEATS &&
-                  (beat.label || trackData.name === "Beat")
-              )}
-            >
-              {beat.label}
-            </Square>
-          );
-        })}
-      </Beats>
+      <Visualizer meter={trackData.synth.meter} fft={trackData.synth.fft} />
+      {beatsEnabaled && (
+        <Beats>
+          {trackData.beats.map((beat) => {
+            return (
+              <Square
+                $isActive={Boolean(
+                  beat.beatNumber === currentBeat % NUMBER_OF_BEATS &&
+                    (beat.label || trackData.name === "Beat")
+                )}
+              >
+                {beat.label}
+              </Square>
+            );
+          })}
+        </Beats>
+      )}
     </TrackContainer>
   );
 };

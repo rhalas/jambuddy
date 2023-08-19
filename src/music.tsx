@@ -10,6 +10,7 @@ import {
   Progressions,
   SongSynths,
   NUMBER_OF_BEATS,
+  TrackSynth,
 } from "./types";
 import { makeNewTrack } from "./utils";
 import * as Tone from "tone";
@@ -76,9 +77,9 @@ const generatedRandomProgression = (
 
 export const generateRhythmTrack = (
   chordProgression: Array<ChordInfo>,
-  synth: Tone.PolySynth
+  synth: TrackSynth
 ): TrackData => {
-  const newRhythmTrack = makeNewTrack("Pads", { polySynth: synth });
+  const newRhythmTrack = makeNewTrack("Pads", synth);
   let currChordPos = 0;
   for (
     let beatNumber = 0;
@@ -109,10 +110,10 @@ export const generateRhythmTrack = (
 };
 
 const generateMelodyTrack = (
-  synth: Tone.PolySynth,
+  synth: TrackSynth,
   scaleNotes: Array<string>
 ): TrackData => {
-  const newMelodyTrack = makeNewTrack("Melody", { polySynth: synth });
+  const newMelodyTrack = makeNewTrack("Melody", synth);
 
   for (
     let beatNumber = 0;
@@ -138,9 +139,9 @@ const generateMelodyTrack = (
 
 export const generateBassDrumTrack = (
   songKey: string,
-  synth: Tone.MembraneSynth
+  synth: TrackSynth
 ): TrackData => {
-  const newBassDrumTrack = makeNewTrack("Bass Drum", { membraneSynth: synth });
+  const newBassDrumTrack = makeNewTrack("Bass Drum", synth);
   const bassBeats = [0, 2];
   for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
     bassBeats.forEach((bassBeat) => {
@@ -154,8 +155,8 @@ export const generateBassDrumTrack = (
   return newBassDrumTrack;
 };
 
-const generateSnareDrumTrack = (synth: Tone.NoiseSynth): TrackData => {
-  const newSnareDrumTrack = makeNewTrack("Snare Drum", { noiseSynth: synth });
+const generateSnareDrumTrack = (synth: TrackSynth): TrackData => {
+  const newSnareDrumTrack = makeNewTrack("Snare Drum", synth);
   const snareBeats = [1, 3];
   for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
     snareBeats.forEach((snareBeat) => {
@@ -168,10 +169,8 @@ const generateSnareDrumTrack = (synth: Tone.NoiseSynth): TrackData => {
   return newSnareDrumTrack;
 };
 
-const generateClosedHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
-  const newClosedHiHatTrack = makeNewTrack("Closed Hi Hat", {
-    noiseSynth: synth,
-  });
+const generateClosedHiHatTrack = (synth: TrackSynth): TrackData => {
+  const newClosedHiHatTrack = makeNewTrack("Closed Hi Hat", synth);
   let closedHiHatBeats = [0, 1, 2];
   for (let bar = 0; bar < 3; bar++) {
     closedHiHatBeats.forEach((closedHiHatBeat) => {
@@ -197,10 +196,8 @@ const generateClosedHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
   return newClosedHiHatTrack;
 };
 
-const generateOpenHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
-  const newOpenHiHatTrack = makeNewTrack("Open Hi Hat", {
-    noiseSynth: synth,
-  });
+const generateOpenHiHatTrack = (synth: TrackSynth): TrackData => {
+  const newOpenHiHatTrack = makeNewTrack("Open Hi Hat", synth);
   let closedHiHatBeats = [2.5, 3];
   for (let bar = 0; bar < 3; bar++) {
     closedHiHatBeats.forEach((closedHiHatBeat) => {
@@ -227,10 +224,10 @@ const generateOpenHiHatTrack = (synth: Tone.NoiseSynth): TrackData => {
 };
 
 const generateBassTrack = (
-  synth: Tone.PolySynth,
+  synth: TrackSynth,
   rhythmTrack: TrackData
 ): TrackData => {
-  const newBassTrack = makeNewTrack("Bass", { polySynth: synth });
+  const newBassTrack = makeNewTrack("Bass", synth);
 
   const chords = [];
   for (let i = 0; i < newBassTrack.beats.length; i++) {
@@ -274,12 +271,18 @@ const generateBassTrack = (
 const generateGuitarRhythmTrack = async (
   progression: Array<ChordInfo>
 ): Promise<TrackData> => {
-  const newGuitarRhythmTrack = makeNewTrack("Guitar", {});
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT();
+
+  const newGuitarRhythmTrack = makeNewTrack("Guitar", {
+    meter: meter,
+    fft: fft,
+  });
   const chordsToFetch = progression.map((p) => p.chordName);
   newGuitarRhythmTrack.synth.samplePlayers = {};
 
   for (let i = 0; i < chordsToFetch.length; i++) {
-    const newPlayer = new Tone.Player().toDestination();
+    const newPlayer = new Tone.Player().fan(meter, fft).toDestination();
     const listOfChords = Object.keys(chordUrls);
     if (listOfChords.includes(chordsToFetch[i])) {
       await newPlayer.load(chordUrls[chordsToFetch[i]]);
