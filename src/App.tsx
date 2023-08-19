@@ -14,7 +14,6 @@ import { ChordInfo, TrackData, KeyInfo, SongSynths } from "./types";
 import { makeTrackLoop } from "./sounds";
 import { makeRandomProgression, notes, progressions } from "./music";
 import { Sequencer } from "./sequencer";
-import { makeNewTrack } from "./utils";
 
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();

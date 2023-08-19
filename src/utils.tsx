@@ -2,7 +2,7 @@ import { Beat, TrackData, NUMBER_OF_BEATS, TrackSynth } from "./types";
 
 export const makeNewTrack = (
   trackName: string,
-  synth: TrackSynth = {}
+  synth: TrackSynth
 ): TrackData => {
   const newBeats = new Array<Beat>(NUMBER_OF_BEATS);
   for (let i = 0; i < newBeats.length; i++) {

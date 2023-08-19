@@ -21,7 +21,7 @@ export const Visualizer = (props: VisualizerProps) => {
   };
 
   const draw = (p5: p5Types) => {
-    const { meter, fft } = props;
+    const { fft } = props;
     if (!fft) {
       return;
     }
