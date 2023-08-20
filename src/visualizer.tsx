@@ -12,7 +12,7 @@ const VisualizerContainer = styled.div`
   display: flex;
 `;
 
-const width = 1000;
+const width = 950;
 const height = 60;
 
 export const Visualizer = (props: VisualizerProps) => {
@@ -31,15 +31,15 @@ export const Visualizer = (props: VisualizerProps) => {
     for (let i = 0; i < levels.length; i++) {
       p5.push();
       p5.strokeWeight(1);
-      const binMapped = p5.map(levels[i], -100, 12, height, 0);
+      const binMapped = p5.map(levels[i], -100, 10, 50, 10);
       p5.stroke(binMapped, binMapped, binMapped);
-      p5.line(i * 25, height, i * 25, binMapped);
+      p5.line(i * 15, height, i * 15, binMapped);
       p5.pop();
 
       p5.push();
       p5.stroke(255, 229, 0);
       p5.strokeWeight(5);
-      p5.line(i * 25 - 3, binMapped, i * 25 + 3, binMapped);
+      p5.line(i * 15 - 3, binMapped, i * 15 + 3, binMapped);
       p5.pop();
     }
   };

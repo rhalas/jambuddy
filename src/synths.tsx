@@ -3,7 +3,7 @@ import { TrackSynth } from "./types";
 
 export const makeSnareDrum = (): TrackSynth => {
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const lowPass = new Tone.Filter({
     frequency: 8000,
@@ -30,7 +30,7 @@ export const makeSnareDrum = (): TrackSynth => {
 
 export const makeBassDrum = (): TrackSynth => {
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const newSynth = new Tone.MembraneSynth({
     volume: 3,
@@ -43,7 +43,7 @@ export const makeBassDrum = (): TrackSynth => {
 
 export const makeLeadSynth = (): TrackSynth => {
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const newLeadSynth = new Tone.PolySynth(Tone.Synth, {
     volume: -3,
@@ -66,7 +66,7 @@ export const makeLeadSynth = (): TrackSynth => {
 
 export const makeRhythmSynth = (): TrackSynth => {
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const newRhythmSynth = new Tone.PolySynth(Tone.Synth)
     .fan(meter, fft)
@@ -89,7 +89,7 @@ export const makeRhythmSynth = (): TrackSynth => {
 
 export const makeBassSynth = (): TrackSynth => {
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
     volume: -6,
@@ -113,7 +113,7 @@ export const makeBassSynth = (): TrackSynth => {
 
 export const makeClosedHiHat = (): TrackSynth => {
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const lowPass = new Tone.Filter({
     frequency: 8000,
@@ -138,7 +138,7 @@ export const makeOpenHiHat = (): TrackSynth => {
   }).toDestination();
 
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const openHiHat = new Tone.NoiseSynth({
     volume: -6,

@@ -148,7 +148,7 @@ export const generateBassDrumTrack = (
       const currentBeat = bar * BEATS_PER_BAR + bassBeat;
       newBassDrumTrack.beats[currentBeat].label = "B";
       newBassDrumTrack.beats[currentBeat].length = "8n";
-      newBassDrumTrack.beats[currentBeat].beatData = [`${songKey}1`];
+      newBassDrumTrack.beats[currentBeat].beatData = [`C1`];
       newBassDrumTrack.beats[currentBeat].triggerTime = `+${bar}:${bassBeat}`;
     });
   }
@@ -272,7 +272,7 @@ const generateGuitarRhythmTrack = async (
   progression: Array<ChordInfo>
 ): Promise<TrackData> => {
   const meter = new Tone.Meter();
-  const fft = new Tone.FFT();
+  const fft = new Tone.FFT(64);
 
   const newGuitarRhythmTrack = makeNewTrack("Guitar", {
     meter: meter,
