@@ -173,7 +173,7 @@ const generateMelodyTrack = (
     currentBeat += Number(nextBeatLength);
     nextBeatLength = getABeatLength();
   } while (currentBeat + Number(nextBeatLength) < NUMBER_OF_BEATS);
-  console.log(newMelodyTrack);
+
   return newMelodyTrack;
 };
 
