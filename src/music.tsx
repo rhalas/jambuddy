@@ -221,7 +221,7 @@ const generateClosedHiHatTrack = (synth: TrackSynth): TrackData => {
   closedHiHatBeats.forEach((closedHiHatBeat) => {
     addNewBeatToTrack(
       newClosedHiHatTrack.beats.length,
-      "S",
+      "CH",
       ["C1"],
       "8n",
       `+${3}:${closedHiHatBeat}`,
