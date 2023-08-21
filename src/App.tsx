@@ -70,17 +70,16 @@ function App() {
     if (readyToGenerateProgression && songKey && songSynths) {
       const getSongInfo = async () => {
         const songInfo = await makeRandomProgression(songKey, songSynths);
-        //const metronomeTrack = makeNewTrack("Beat");
 
         const newTracks = [
           songInfo.rhythmTrack,
-          songInfo.guitarRhythmTrack,
           songInfo.melodyTrack,
           songInfo.bassTrack,
+          songInfo.guitarRhythmTrack,
           songInfo.bassDrumTrack,
           songInfo.snareDrumTrack,
-          songInfo.closedHiHatTrack,
           songInfo.openHiHatTrack,
+          songInfo.closedHiHatTrack,
         ];
 
         setTracks(newTracks);
@@ -102,7 +101,6 @@ function App() {
         }
       });
       setActiveLoops(newLoops);
-      console.log(activeLoops);
       Tone.Transport.start();
     }
   }, [songReady, tracks]);

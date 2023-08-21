@@ -68,6 +68,7 @@ export type TrackData = {
   beats: Array<Beat>;
   name: string;
   synth: TrackSynth;
+  totalBeats: number;
 };
 
 export interface ChordUrl {
@@ -84,6 +85,10 @@ export interface Progressions {
 
 export interface ChordFormula {
   [key: string]: Array<number>;
+}
+
+export interface BeatToneLength {
+  [key: string]: string;
 }
 
 export type KeyInfo = {

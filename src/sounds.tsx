@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { NUMBER_OF_BARS, BEATS_PER_BAR, Beat, TrackSynth } from "./types";
+import { NUMBER_OF_BARS, Beat, TrackSynth } from "./types";
 
 export const makeTrackLoop = (
   synth: TrackSynth,
@@ -27,15 +27,8 @@ export const makeTrackLoop = (
           synth.noiseSynth.triggerAttackRelease(beat.length, beat.triggerTime);
         } else if (synth.samplePlayers) {
           if (beat.label) {
-            const bar = Math.floor(beat.beatNumber / BEATS_PER_BAR);
-            const measure = Math.floor(beat.beatNumber % 4);
-
             const currentPlayer = synth.samplePlayers[beat.label];
-            currentPlayer.start(
-              `+${bar}:${measure}`,
-              0,
-              `+${bar + 1}:${measure}`
-            );
+            currentPlayer.start(beat.triggerTime, 0, beat.length);
           }
         }
       }

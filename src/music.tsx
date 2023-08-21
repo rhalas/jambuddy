@@ -11,6 +11,8 @@ import {
   SongSynths,
   NUMBER_OF_BEATS,
   TrackSynth,
+  BeatToneLength,
+  Beat,
 } from "./types";
 import { makeNewTrack } from "./utils";
 import * as Tone from "tone";
@@ -53,16 +55,17 @@ const generatedRandomProgression = (
   chordDetails: Array<ChordInfo>
 ): Array<ChordInfo> => {
   const chordProgression: Array<ChordInfo> = [];
+  const chords = chordDetails.filter((c) => !c.position.includes("°"));
+
   for (let i = 0; i < NUMBER_OF_BARS; i++) {
-    let randomChord =
-      chordDetails[Math.floor(Math.random() * chordDetails.length)];
+    let randomChord = chords[Math.floor(Math.random() * chords.length)];
+
     if (chordProgression.length >= 1) {
       while (
         randomChord.position ===
         chordProgression[chordProgression.length - 1].position
       ) {
-        randomChord =
-          chordDetails[Math.floor(Math.random() * chordDetails.length)];
+        randomChord = chords[Math.floor(Math.random() * chords.length)];
       }
     }
     chordProgression.push({
@@ -71,8 +74,26 @@ const generatedRandomProgression = (
       notes: randomChord.notes,
     });
   }
-
   return chordProgression;
+};
+
+const addNewBeatToTrack = (
+  beatNumber: number,
+  label: string,
+  beatData: Array<string>,
+  length: string,
+  triggerTime: string,
+  track: TrackData
+) => {
+  const newBeat = {
+    beatNumber: beatNumber,
+    label: label,
+    beatData: beatData,
+    length: length,
+    triggerTime: triggerTime,
+  };
+
+  track.beats.push(newBeat);
 };
 
 export const generateRhythmTrack = (
@@ -80,33 +101,36 @@ export const generateRhythmTrack = (
   synth: TrackSynth
 ): TrackData => {
   const newRhythmTrack = makeNewTrack("Pads", synth);
-  let currChordPos = 0;
-  for (
-    let beatNumber = 0;
-    beatNumber < newRhythmTrack.beats.length;
-    beatNumber++
-  ) {
-    if (beatNumber % BEATS_PER_BAR == 0) {
-      newRhythmTrack.beats[beatNumber] = {
-        beatNumber: beatNumber,
-        label: chordProgression[currChordPos].chordName,
-        beatData: chordProgression[currChordPos].notes,
-        length: "1n",
-        triggerTime: `+${Math.floor(beatNumber / BEATS_PER_BAR)}:0`,
-      };
-      currChordPos += 1;
-    } else {
-      newRhythmTrack.beats[beatNumber] = {
-        beatNumber: beatNumber,
-        label: "",
-        beatData: [],
-        length: "",
-        triggerTime: "",
-      };
-    }
+
+  for (let i = 0; i < chordProgression.length; i++) {
+    addNewBeatToTrack(
+      i,
+      chordProgression[i].chordName,
+      chordProgression[i].notes,
+      "1n",
+      `+${i}:0`,
+      newRhythmTrack
+    );
   }
 
   return newRhythmTrack;
+};
+
+const BEAT_LENGTHS = ["1", "0.5"];
+const BEAT_LENGTH_TO_TONE_LENGTH: BeatToneLength = {
+  "1": "4n",
+  "0.5": "8n",
+  "0.25": "8n",
+};
+
+const getABeatLength = () => {
+  return BEAT_LENGTHS[Math.floor(Math.random() * BEAT_LENGTHS.length)];
+};
+
+const beatToTriggerTime = (currentBeat: number): string => {
+  const measure = Math.floor(currentBeat / BEATS_PER_BAR);
+  const beat = currentBeat % 4;
+  return `+${measure}:${beat}`;
 };
 
 const generateMelodyTrack = (
@@ -114,42 +138,44 @@ const generateMelodyTrack = (
   scaleNotes: Array<string>
 ): TrackData => {
   const newMelodyTrack = makeNewTrack("Melody", synth);
-
-  for (
-    let beatNumber = 0;
-    beatNumber < newMelodyTrack.beats.length;
-    beatNumber++
-  ) {
+  let nextBeatLength = getABeatLength();
+  let currentBeat = 0;
+  do {
     if (Math.floor(Math.random() * 2) == 1) {
       const note = scaleNotes[Math.floor(Math.random() * scaleNotes.length)];
       const octave = Math.floor(Math.random() * 2) + 3;
       const newNote = `${note}${octave}`;
 
-      newMelodyTrack.beats[beatNumber].label = newNote;
-      newMelodyTrack.beats[beatNumber].beatData = [newNote];
-      newMelodyTrack.beats[beatNumber].length = "8n";
-      newMelodyTrack.beats[beatNumber].triggerTime = `+${Math.floor(
-        beatNumber / BEATS_PER_BAR
-      )}:${Math.floor(beatNumber % 4)}`;
+      addNewBeatToTrack(
+        newMelodyTrack.beats.length,
+        newNote,
+        [newNote],
+        BEAT_LENGTH_TO_TONE_LENGTH[nextBeatLength],
+        beatToTriggerTime(currentBeat),
+        newMelodyTrack
+      );
     }
-  }
+
+    currentBeat += Number(nextBeatLength);
+    nextBeatLength = getABeatLength();
+  } while (currentBeat + Number(nextBeatLength) < NUMBER_OF_BEATS);
 
   return newMelodyTrack;
 };
 
-export const generateBassDrumTrack = (
-  songKey: string,
-  synth: TrackSynth
-): TrackData => {
+export const generateBassDrumTrack = (synth: TrackSynth): TrackData => {
   const newBassDrumTrack = makeNewTrack("Bass Drum", synth);
   const bassBeats = [0, 2];
   for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
     bassBeats.forEach((bassBeat) => {
-      const currentBeat = bar * BEATS_PER_BAR + bassBeat;
-      newBassDrumTrack.beats[currentBeat].label = "B";
-      newBassDrumTrack.beats[currentBeat].length = "8n";
-      newBassDrumTrack.beats[currentBeat].beatData = [`C1`];
-      newBassDrumTrack.beats[currentBeat].triggerTime = `+${bar}:${bassBeat}`;
+      addNewBeatToTrack(
+        newBassDrumTrack.beats.length,
+        "B",
+        ["C1"],
+        "8n",
+        `+${bar}:${bassBeat}`,
+        newBassDrumTrack
+      );
     });
   }
   return newBassDrumTrack;
@@ -160,37 +186,47 @@ const generateSnareDrumTrack = (synth: TrackSynth): TrackData => {
   const snareBeats = [1, 3];
   for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
     snareBeats.forEach((snareBeat) => {
-      const currentBeat = bar * BEATS_PER_BAR + snareBeat;
-      newSnareDrumTrack.beats[currentBeat].label = "S";
-      newSnareDrumTrack.beats[currentBeat].length = "8n";
-      newSnareDrumTrack.beats[currentBeat].triggerTime = `+${bar}:${snareBeat}`;
+      addNewBeatToTrack(
+        newSnareDrumTrack.beats.length,
+        "S",
+        ["C1"],
+        "8n",
+        `+${bar}:${snareBeat}`,
+        newSnareDrumTrack
+      );
     });
   }
+
   return newSnareDrumTrack;
 };
 
 const generateClosedHiHatTrack = (synth: TrackSynth): TrackData => {
   const newClosedHiHatTrack = makeNewTrack("Closed Hi Hat", synth);
   let closedHiHatBeats = [0, 1, 2];
-  for (let bar = 0; bar < 3; bar++) {
+
+  for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
     closedHiHatBeats.forEach((closedHiHatBeat) => {
-      const currentBeat = bar * BEATS_PER_BAR + closedHiHatBeat;
-      newClosedHiHatTrack.beats[currentBeat].label = "CH";
-      newClosedHiHatTrack.beats[currentBeat].length = "8n";
-      newClosedHiHatTrack.beats[
-        currentBeat
-      ].triggerTime = `+${bar}:${closedHiHatBeat}`;
+      addNewBeatToTrack(
+        newClosedHiHatTrack.beats.length,
+        "CH",
+        ["C1"],
+        "8n",
+        `+${bar}:${closedHiHatBeat}`,
+        newClosedHiHatTrack
+      );
     });
   }
 
   closedHiHatBeats = [0, 2];
   closedHiHatBeats.forEach((closedHiHatBeat) => {
-    const currentBeat = Math.floor(3 * BEATS_PER_BAR + closedHiHatBeat);
-    newClosedHiHatTrack.beats[currentBeat].label = "CH";
-    newClosedHiHatTrack.beats[currentBeat].length = "8n";
-    newClosedHiHatTrack.beats[
-      currentBeat
-    ].triggerTime = `+${3}:${closedHiHatBeat}`;
+    addNewBeatToTrack(
+      newClosedHiHatTrack.beats.length,
+      "S",
+      ["C1"],
+      "8n",
+      `+${3}:${closedHiHatBeat}`,
+      newClosedHiHatTrack
+    );
   });
 
   return newClosedHiHatTrack;
@@ -198,26 +234,30 @@ const generateClosedHiHatTrack = (synth: TrackSynth): TrackData => {
 
 const generateOpenHiHatTrack = (synth: TrackSynth): TrackData => {
   const newOpenHiHatTrack = makeNewTrack("Open Hi Hat", synth);
-  let closedHiHatBeats = [2.5, 3];
+  let openHiHatBeats = [2.5, 3];
   for (let bar = 0; bar < 3; bar++) {
-    closedHiHatBeats.forEach((closedHiHatBeat) => {
-      const currentBeat = Math.floor(bar * BEATS_PER_BAR + closedHiHatBeat);
-      newOpenHiHatTrack.beats[currentBeat].label = "OH";
-      newOpenHiHatTrack.beats[currentBeat].length = "8n";
-      newOpenHiHatTrack.beats[
-        currentBeat
-      ].triggerTime = `+${bar}:${closedHiHatBeat}`;
+    openHiHatBeats.forEach((openHiHatBeat) => {
+      addNewBeatToTrack(
+        newOpenHiHatTrack.beats.length,
+        "OH",
+        ["C1"],
+        "8n",
+        `+${bar}:${openHiHatBeat}`,
+        newOpenHiHatTrack
+      );
     });
   }
 
-  closedHiHatBeats = [1, 3];
-  closedHiHatBeats.forEach((closedHiHatBeat) => {
-    const currentBeat = Math.floor(3 * BEATS_PER_BAR + closedHiHatBeat);
-    newOpenHiHatTrack.beats[currentBeat].label = "OH";
-    newOpenHiHatTrack.beats[currentBeat].length = "8n";
-    newOpenHiHatTrack.beats[
-      currentBeat
-    ].triggerTime = `+${3}:${closedHiHatBeat}`;
+  openHiHatBeats = [1, 3];
+  openHiHatBeats.forEach((openHiHatBeat) => {
+    addNewBeatToTrack(
+      newOpenHiHatTrack.beats.length,
+      "OH",
+      ["C1"],
+      "8n",
+      `+${3}:${openHiHatBeat}`,
+      newOpenHiHatTrack
+    );
   });
 
   return newOpenHiHatTrack;
@@ -230,7 +270,7 @@ const generateBassTrack = (
   const newBassTrack = makeNewTrack("Bass", synth);
 
   const chords = [];
-  for (let i = 0; i < newBassTrack.beats.length; i++) {
+  for (let i = 0; i < rhythmTrack.beats.length; i++) {
     if (rhythmTrack.beats[i].beatData.length) {
       chords.push(rhythmTrack.beats[i].beatData);
     }
@@ -239,32 +279,37 @@ const generateBassTrack = (
   for (let i = 0; i < chords.length; i++) {
     const chordNotes = chords[i];
 
-    newBassTrack.beats[i * BEATS_PER_BAR].beatData = [
+    addNewBeatToTrack(
+      newBassTrack.beats.length,
       `${chords[i][0].slice(0, -1)}2`,
-    ];
-    newBassTrack.beats[i * BEATS_PER_BAR].label = `${chords[i][0].slice(
-      0,
-      -1
-    )}2`;
-    newBassTrack.beats[i * BEATS_PER_BAR].length = "8n";
-    newBassTrack.beats[i * BEATS_PER_BAR].triggerTime = `+${i}:0`;
+      [`${chords[i][0].slice(0, -1)}2`],
+      "8n",
+      `+${i}:0`,
+      newBassTrack
+    );
 
-    for (let measure = 1; measure < BEATS_PER_BAR; measure++) {
+    let nextBeatLength = getABeatLength();
+    let currentBeat = 1;
+    do {
       if (Math.floor(Math.random() * 3) == 1) {
         const randomNote = `${chordNotes[
           Math.floor(Math.random() * chords[0].length)
         ].slice(0, -1)}2`;
 
-        newBassTrack.beats[i * BEATS_PER_BAR + measure].beatData = [randomNote];
-        newBassTrack.beats[i * BEATS_PER_BAR + measure].label = randomNote;
-        newBassTrack.beats[i * BEATS_PER_BAR + measure].length = "8n";
-        newBassTrack.beats[
-          i * BEATS_PER_BAR + measure
-        ].triggerTime = `+${i}:${measure}`;
+        addNewBeatToTrack(
+          newBassTrack.beats.length,
+          randomNote,
+          [randomNote],
+          BEAT_LENGTH_TO_TONE_LENGTH[nextBeatLength],
+          beatToTriggerTime(currentBeat + i * BEATS_PER_BAR),
+          newBassTrack
+        );
       }
-    }
-  }
 
+      currentBeat += Number(nextBeatLength);
+      nextBeatLength = getABeatLength();
+    } while (currentBeat + Number(nextBeatLength) < 3);
+  }
   return newBassTrack;
 };
 
@@ -286,11 +331,13 @@ const generateGuitarRhythmTrack = async (
     const listOfChords = Object.keys(chordUrls);
     if (listOfChords.includes(chordsToFetch[i])) {
       await newPlayer.load(chordUrls[chordsToFetch[i]]);
-      newPlayer.volume.value = -5;
+      newPlayer.volume.value = -7;
 
-      const measureToPlay = i * BEATS_PER_BAR;
-      newGuitarRhythmTrack.beats[measureToPlay].label = chordsToFetch[i];
-      newGuitarRhythmTrack.beats[measureToPlay].length = "8n";
+      newGuitarRhythmTrack.beats.push({
+        label: chordsToFetch[i],
+        length: "1n",
+        triggerTime: `+${i}:0`,
+      } as Beat);
       newGuitarRhythmTrack.synth.samplePlayers[chordsToFetch[i]] = newPlayer;
     }
   }
@@ -367,15 +414,13 @@ export const makeRandomProgression = async (
 
   const progression = generatedRandomProgression(chordDetails);
   const rhythmTrack = generateRhythmTrack(progression, songSynths.rhythm);
+
   const melodyTrack = generateMelodyTrack(songSynths.lead, scale);
-  const bassDrumTrack = generateBassDrumTrack(
-    songKey.rootNote,
-    songSynths.bassDrum
-  );
+  const bassDrumTrack = generateBassDrumTrack(songSynths.bassDrum);
   const snareDrumTrack = generateSnareDrumTrack(songSynths.snareDrum);
-  const bassTrack = generateBassTrack(songSynths.bass, rhythmTrack);
   const closedHiHatTrack = generateClosedHiHatTrack(songSynths.closedHiHat);
   const openHiHatTrack = generateOpenHiHatTrack(songSynths.openHiHat);
+  const bassTrack = generateBassTrack(songSynths.bass, rhythmTrack);
   const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
 
   return {

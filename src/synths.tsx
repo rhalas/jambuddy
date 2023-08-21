@@ -46,9 +46,9 @@ export const makeLeadSynth = (): TrackSynth => {
   const fft = new Tone.FFT(64);
 
   const newLeadSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -3,
+    volume: -2,
     oscillator: {
-      type: "sawtooth",
+      type: "amsawtooth3",
     },
     portamento: 0.005,
   })
@@ -72,9 +72,9 @@ export const makeRhythmSynth = (): TrackSynth => {
     .fan(meter, fft)
     .toDestination();
   newRhythmSynth.set({
-    volume: 2,
+    volume: -10,
     oscillator: {
-      type: "fatsine",
+      type: "fatsine9",
     },
   });
 
@@ -92,21 +92,13 @@ export const makeBassSynth = (): TrackSynth => {
   const fft = new Tone.FFT(64);
 
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -6,
+    volume: -7,
     oscillator: {
       type: "sawtooth",
     },
   })
     .fan(meter, fft)
     .toDestination();
-
-  const tremolo = new Tone.Tremolo({
-    frequency: 10,
-    type: "sine",
-    depth: 0.5,
-    spread: 180,
-  }).toDestination();
-  newBassSynth.connect(tremolo);
 
   return { polySynth: newBassSynth, meter: meter, fft: fft };
 };

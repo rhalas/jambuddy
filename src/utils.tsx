@@ -4,10 +4,10 @@ export const makeNewTrack = (
   trackName: string,
   synth: TrackSynth
 ): TrackData => {
-  const newBeats = new Array<Beat>(NUMBER_OF_BEATS);
-  for (let i = 0; i < newBeats.length; i++) {
-    newBeats[i] = { beatNumber: i } as Beat;
-  }
-
-  return { beats: newBeats, name: trackName, synth: synth };
+  return {
+    beats: new Array<Beat>(),
+    name: trackName,
+    synth: synth,
+    totalBeats: NUMBER_OF_BEATS,
+  };
 };
