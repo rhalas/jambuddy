@@ -24,7 +24,6 @@ function App() {
   const [beatNumber, setBeatNumber] = useState<number>(-1);
   const [tracks, setTracks] = useState<Array<TrackData>>([]);
   const [songKey, setSongKey] = useState<KeyInfo | undefined>();
-  const [activeLoops, setActiveLoops] = useState<Array<Tone.Loop>>([]);
 
   const [readyToGenerateProgression, setReadyToGenerateProgression] =
     useState<boolean>(false);
@@ -100,7 +99,6 @@ function App() {
           newLoops.push(makeTrackLoop(track.synth, track.beats, newTempo));
         }
       });
-      setActiveLoops(newLoops);
       Tone.Transport.start();
     }
   }, [songReady, tracks]);
