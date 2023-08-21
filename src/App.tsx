@@ -22,7 +22,6 @@ function App() {
   const [songReady, setSongReady] = useState<boolean>(false);
 
   const [beatNumber, setBeatNumber] = useState<number>(-1);
-  const [tempo, setTempo] = useState<number>(120);
   const [tracks, setTracks] = useState<Array<TrackData>>([]);
   const [songKey, setSongKey] = useState<KeyInfo | undefined>();
 
@@ -94,7 +93,6 @@ function App() {
   useEffect(() => {
     if (songReady) {
       const newTempo = Math.floor(Math.random() * (160 - 80 + 1)) + 80;
-      setTempo(newTempo);
       const newLoops: Array<Tone.Loop> = [];
       tracks.forEach((track) => {
         if (track.synth) {
