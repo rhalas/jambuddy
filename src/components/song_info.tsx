@@ -1,4 +1,4 @@
-import { KeyInfo, ChordInfo } from "./types";
+import { KeyInfo, ChordInfo } from "../helpers/types/types";
 import styled from "styled-components";
 
 const SongInfoContainer = styled.div``;

@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { TrackSynth } from "./types";
+import { TrackSynth } from "../types/types";
 
 export const makeSnareDrum = (): TrackSynth => {
   const meter = new Tone.Meter();

@@ -6,7 +6,7 @@ import {
   SongSynths,
   TrackSynth,
   Beat,
-} from "./types";
+} from "../types/types";
 import {
   NUMBER_OF_BARS,
   BEATS_PER_BAR,
@@ -17,9 +17,8 @@ import {
   progressions,
   BEAT_LENGTHS,
   BEAT_LENGTH_TO_MIDI,
-} from "./music_types";
-import { addNewBeatToTrack } from "./track_utils";
-import { makeNewTrack } from "./utils";
+} from "../types/music_types";
+import { makeNewTrack, addNewBeatToTrack } from "../utils/track_utils";
 import * as Tone from "tone";
 
 const generatedRandomProgression = (

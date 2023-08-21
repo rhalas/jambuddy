@@ -1,4 +1,4 @@
-import { TrackData } from "./types";
+import { TrackData } from "../helpers/types/types";
 import { Track } from "./track";
 
 type SequencerProps = {

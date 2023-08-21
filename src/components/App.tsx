@@ -9,11 +9,21 @@ import {
   makeBassSynth,
   makeClosedHiHat,
   makeOpenHiHat,
-} from "./synths";
-import { ChordInfo, TrackData, KeyInfo, SongSynths } from "./types";
-import { MAX_TEMPO, MIN_TEMPO, notes, progressions } from "./music_types";
-import { makeTrackLoop } from "./sounds";
-import { makeRandomProgression } from "./music";
+} from "../helpers/music/synths";
+import {
+  ChordInfo,
+  TrackData,
+  KeyInfo,
+  SongSynths,
+} from "../helpers/types/types";
+import {
+  MAX_TEMPO,
+  MIN_TEMPO,
+  notes,
+  progressions,
+} from "../helpers/types/music_types";
+import { makeTrackLoop } from "../helpers/music/sounds";
+import { makeRandomProgression } from "../helpers/music/music";
 import { Sequencer } from "./sequencer";
 import { SongInfo } from "./song_info";
 
