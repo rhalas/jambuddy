@@ -34,6 +34,8 @@ function App() {
   const [songReady, setSongReady] = useState<boolean>(false);
 
   const [beatNumber, setBeatNumber] = useState<number>(-1);
+  const [tempo, setTempo] = useState<number>(120);
+
   const [tracks, setTracks] = useState<Array<TrackData>>([]);
   const [songKey, setSongKey] = useState<KeyInfo | undefined>();
 
@@ -106,6 +108,7 @@ function App() {
     if (songReady) {
       const newTempo =
         Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
+      setTempo(newTempo);
       const newLoops: Array<Tone.Loop> = [];
       tracks.forEach((track) => {
         if (track.synth) {
@@ -123,7 +126,12 @@ function App() {
           <button onClick={generateNewProgression}>Play a song</button>
         ) : (
           <>
-            <SongInfo songKey={songKey!} progression={progression} />
+            <SongInfo
+              songKey={songKey!}
+              progression={progression}
+              tracks={tracks}
+              tempo={tempo}
+            />
             <Sequencer tracks={tracks} currentBeat={beatNumber} />
           </>
         )}

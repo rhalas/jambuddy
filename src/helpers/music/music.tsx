@@ -234,22 +234,29 @@ const generateBassTrack = (
   }
 
   let beatsSinceLastNote = [];
+  let nextBeatLength = "";
 
   for (let i = 0; i < chords.length; i++) {
     const chordNotes = chords[i];
+
+    if (nextBeatLength) {
+      beatsSinceLastNote.push(BEAT_LENGTH_TO_MIDI[nextBeatLength]);
+    }
 
     addNewBeatToTrack(
       `${chords[i][0].slice(0, -1)}2`,
       [`${chords[i][0].slice(0, -1)}2`],
       `+${i}:0`,
       newBassTrack,
-      0.25,
+      1,
       beatsSinceLastNote
     );
     beatsSinceLastNote = [];
 
-    let nextBeatLength = getABeatLength();
+    nextBeatLength = getABeatLength();
     let currentBeat = 1;
+    beatsSinceLastNote.push(BEAT_LENGTH_TO_MIDI["1"]);
+
     do {
       if (Math.floor(Math.random() * 3) == 1) {
         const randomNote = `${chordNotes[
