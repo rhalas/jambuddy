@@ -1,4 +1,5 @@
-import { Beat, TrackData, NUMBER_OF_BEATS, TrackSynth } from "./types";
+import { Beat, TrackData, TrackSynth } from "./types";
+import { NUMBER_OF_BEATS } from "./music_types";
 
 export const makeNewTrack = (
   trackName: string,

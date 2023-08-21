@@ -1,5 +1,6 @@
 import * as Tone from "tone";
-import { NUMBER_OF_BARS, Beat, TrackSynth } from "./types";
+import { Beat, TrackSynth } from "./types";
+import { NUMBER_OF_BARS } from "./music_types";
 
 export const makeTrackLoop = (
   synth: TrackSynth,

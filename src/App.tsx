@@ -11,9 +11,11 @@ import {
   makeOpenHiHat,
 } from "./synths";
 import { ChordInfo, TrackData, KeyInfo, SongSynths } from "./types";
+import { MAX_TEMPO, MIN_TEMPO, notes, progressions } from "./music_types";
 import { makeTrackLoop } from "./sounds";
-import { makeRandomProgression, notes, progressions } from "./music";
+import { makeRandomProgression } from "./music";
 import { Sequencer } from "./sequencer";
+import { SongInfo } from "./song_info";
 
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();
@@ -74,7 +76,7 @@ function App() {
           songInfo.rhythmTrack,
           songInfo.melodyTrack,
           songInfo.bassTrack,
-          //songInfo.guitarRhythmTrack,
+          songInfo.guitarRhythmTrack,
           songInfo.bassDrumTrack,
           songInfo.snareDrumTrack,
           songInfo.openHiHatTrack,
@@ -92,7 +94,8 @@ function App() {
 
   useEffect(() => {
     if (songReady) {
-      const newTempo = Math.floor(Math.random() * (160 - 80 + 1)) + 80;
+      const newTempo =
+        Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
       const newLoops: Array<Tone.Loop> = [];
       tracks.forEach((track) => {
         if (track.synth) {
@@ -110,20 +113,11 @@ function App() {
           <button onClick={generateNewProgression}>Play a song</button>
         ) : (
           <>
-            <div>
-              <div>
-                Key: {songKey?.rootNote} {songKey?.progression}
-              </div>
-              <div>
-                Chord Progression:{" "}
-                {progression &&
-                  progression.map((p: ChordInfo) => p.position).join(" - ")}
-              </div>
-            </div>
+            <SongInfo songKey={songKey!} progression={progression} />
+            <Sequencer tracks={tracks} currentBeat={beatNumber} />
           </>
         )}
       </div>
-      <Sequencer tracks={tracks} currentBeat={beatNumber} />
     </>
   );
 }

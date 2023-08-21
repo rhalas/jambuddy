@@ -1,55 +1,26 @@
 import {
   ChordInfo,
   SongInfo,
-  NUMBER_OF_BARS,
-  BEATS_PER_BAR,
   TrackData,
-  ChordUrl,
   KeyInfo,
-  Scales,
-  Progressions,
   SongSynths,
-  NUMBER_OF_BEATS,
   TrackSynth,
-  BeatToneLength,
   Beat,
 } from "./types";
+import {
+  NUMBER_OF_BARS,
+  BEATS_PER_BAR,
+  NUMBER_OF_BEATS,
+  chordUrls,
+  notes,
+  scales,
+  progressions,
+  BEAT_LENGTHS,
+  BEAT_LENGTH_TO_MIDI,
+} from "./music_types";
+import { addNewBeatToTrack } from "./track_utils";
 import { makeNewTrack } from "./utils";
 import * as Tone from "tone";
-
-export const notes: Array<string> = [
-  "Ab",
-  "A",
-  "Bb",
-  "B",
-  "C",
-  "Db",
-  "D",
-  "Eb",
-  "E",
-  "F",
-  "Gb",
-  "G",
-];
-
-export const scales: Scales = {
-  Major: [0, 2, 2, 1, 2, 2, 2],
-  Minor: [0, 2, 1, 2, 2, 1, 2],
-};
-
-export const progressions: Progressions = {
-  Major: ["I", "ii", "iii", "IV", "V", "vi", "VII°"],
-  Minor: ["i", "ii°", "III", "iv", "v", "VI", "VII"],
-};
-
-export const chordUrls: ChordUrl = {
-  Am: "https://jambuddy.s3.amazonaws.com/a_minor.m4a",
-  C: "https://jambuddy.s3.amazonaws.com/c_major.m4a",
-  Dm: "https://jambuddy.s3.amazonaws.com/d_minor.m4a",
-  Em: "https://jambuddy.s3.amazonaws.com/e_minor.m4a",
-  F: "https://jambuddy.s3.amazonaws.com/f_major.m4a",
-  G: "https://jambuddy.s3.amazonaws.com/g_major.m4a",
-};
 
 const generatedRandomProgression = (
   chordDetails: Array<ChordInfo>
@@ -77,27 +48,6 @@ const generatedRandomProgression = (
   return chordProgression;
 };
 
-const addNewBeatToTrack = (
-  label: string,
-  beatData: Array<string>,
-  triggerTime: string,
-  track: TrackData,
-  beatLength: number,
-  beatsSinceLastNote: Array<string>
-) => {
-  const newBeat = {
-    beatNumber: track.beats.length,
-    label: label,
-    beatData: beatData,
-    length: BEAT_LENGTH_TO_TONE_LENGTH[beatLength],
-    triggerTime: triggerTime,
-    beatLength: beatLength,
-    beatsSinceLastNote: beatsSinceLastNote,
-  };
-
-  track.beats.push(newBeat);
-};
-
 export const generateRhythmTrack = (
   chordProgression: Array<ChordInfo>,
   synth: TrackSynth
@@ -116,20 +66,6 @@ export const generateRhythmTrack = (
   }
 
   return newRhythmTrack;
-};
-
-const BEAT_LENGTHS = ["1", "0.5"];
-const BEAT_LENGTH_TO_TONE_LENGTH: BeatToneLength = {
-  "4": "1n",
-  "1": "4n",
-  "0.5": "8n",
-  "0.25": "8n",
-};
-const BEAT_LENGTH_TO_MIDI: BeatToneLength = {
-  "4": "1",
-  "1": "4",
-  "0.5": "8",
-  "0.25": "8",
 };
 
 const getABeatLength = () => {
