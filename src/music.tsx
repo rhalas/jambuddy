@@ -78,19 +78,21 @@ const generatedRandomProgression = (
 };
 
 const addNewBeatToTrack = (
-  beatNumber: number,
   label: string,
   beatData: Array<string>,
-  length: string,
   triggerTime: string,
-  track: TrackData
+  track: TrackData,
+  beatLength: number,
+  beatsSinceLastNote: Array<string>
 ) => {
   const newBeat = {
-    beatNumber: beatNumber,
+    beatNumber: track.beats.length,
     label: label,
     beatData: beatData,
-    length: length,
+    length: BEAT_LENGTH_TO_TONE_LENGTH[beatLength],
     triggerTime: triggerTime,
+    beatLength: beatLength,
+    beatsSinceLastNote: beatsSinceLastNote,
   };
 
   track.beats.push(newBeat);
@@ -104,12 +106,12 @@ export const generateRhythmTrack = (
 
   for (let i = 0; i < chordProgression.length; i++) {
     addNewBeatToTrack(
-      i,
       chordProgression[i].chordName,
       chordProgression[i].notes,
-      "1n",
       `+${i}:0`,
-      newRhythmTrack
+      newRhythmTrack,
+      4,
+      []
     );
   }
 
@@ -118,9 +120,16 @@ export const generateRhythmTrack = (
 
 const BEAT_LENGTHS = ["1", "0.5"];
 const BEAT_LENGTH_TO_TONE_LENGTH: BeatToneLength = {
+  "4": "1n",
   "1": "4n",
   "0.5": "8n",
   "0.25": "8n",
+};
+const BEAT_LENGTH_TO_MIDI: BeatToneLength = {
+  "4": "1",
+  "1": "4",
+  "0.5": "8",
+  "0.25": "8",
 };
 
 const getABeatLength = () => {
@@ -140,26 +149,31 @@ const generateMelodyTrack = (
   const newMelodyTrack = makeNewTrack("Melody", synth);
   let nextBeatLength = getABeatLength();
   let currentBeat = 0;
+  let beatsSinceLastNote = [];
   do {
+    let newNote = "";
     if (Math.floor(Math.random() * 2) == 1) {
       const note = scaleNotes[Math.floor(Math.random() * scaleNotes.length)];
       const octave = Math.floor(Math.random() * 2) + 3;
-      const newNote = `${note}${octave}`;
+      newNote = `${note}${octave}`;
 
       addNewBeatToTrack(
-        newMelodyTrack.beats.length,
         newNote,
         [newNote],
-        BEAT_LENGTH_TO_TONE_LENGTH[nextBeatLength],
         beatToTriggerTime(currentBeat),
-        newMelodyTrack
+        newMelodyTrack,
+        Number(nextBeatLength),
+        beatsSinceLastNote
       );
-    }
 
+      beatsSinceLastNote = [];
+    } else {
+      beatsSinceLastNote.push(BEAT_LENGTH_TO_MIDI[nextBeatLength]);
+    }
     currentBeat += Number(nextBeatLength);
     nextBeatLength = getABeatLength();
   } while (currentBeat + Number(nextBeatLength) < NUMBER_OF_BEATS);
-
+  console.log(newMelodyTrack);
   return newMelodyTrack;
 };
 
@@ -169,12 +183,12 @@ export const generateBassDrumTrack = (synth: TrackSynth): TrackData => {
   for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
     bassBeats.forEach((bassBeat) => {
       addNewBeatToTrack(
-        newBassDrumTrack.beats.length,
         "B",
         ["C1"],
-        "8n",
         `+${bar}:${bassBeat}`,
-        newBassDrumTrack
+        newBassDrumTrack,
+        0.25,
+        newBassDrumTrack.beats.length === 0 ? [] : [BEAT_LENGTH_TO_MIDI["0.25"]]
       );
     });
   }
@@ -187,12 +201,14 @@ const generateSnareDrumTrack = (synth: TrackSynth): TrackData => {
   for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
     snareBeats.forEach((snareBeat) => {
       addNewBeatToTrack(
-        newSnareDrumTrack.beats.length,
         "S",
         ["C1"],
-        "8n",
         `+${bar}:${snareBeat}`,
-        newSnareDrumTrack
+        newSnareDrumTrack,
+        0.25,
+        newSnareDrumTrack.beats.length === 0
+          ? []
+          : [BEAT_LENGTH_TO_MIDI["0.25"]]
       );
     });
   }
@@ -204,15 +220,17 @@ const generateClosedHiHatTrack = (synth: TrackSynth): TrackData => {
   const newClosedHiHatTrack = makeNewTrack("Closed Hi Hat", synth);
   let closedHiHatBeats = [0, 1, 2];
 
-  for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR; bar++) {
+  for (let bar = 0; bar < NUMBER_OF_BEATS / BEATS_PER_BAR - 1; bar++) {
     closedHiHatBeats.forEach((closedHiHatBeat) => {
       addNewBeatToTrack(
-        newClosedHiHatTrack.beats.length,
         "CH",
         ["C1"],
-        "8n",
         `+${bar}:${closedHiHatBeat}`,
-        newClosedHiHatTrack
+        newClosedHiHatTrack,
+        0.25,
+        newClosedHiHatTrack.beats.length === 0
+          ? []
+          : [BEAT_LENGTH_TO_MIDI["0.25"]]
       );
     });
   }
@@ -220,12 +238,14 @@ const generateClosedHiHatTrack = (synth: TrackSynth): TrackData => {
   closedHiHatBeats = [0, 2];
   closedHiHatBeats.forEach((closedHiHatBeat) => {
     addNewBeatToTrack(
-      newClosedHiHatTrack.beats.length,
       "CH",
       ["C1"],
-      "8n",
       `+${3}:${closedHiHatBeat}`,
-      newClosedHiHatTrack
+      newClosedHiHatTrack,
+      0.25,
+      newClosedHiHatTrack.beats.length === 0
+        ? []
+        : [BEAT_LENGTH_TO_MIDI["0.25"]]
     );
   });
 
@@ -238,12 +258,14 @@ const generateOpenHiHatTrack = (synth: TrackSynth): TrackData => {
   for (let bar = 0; bar < 3; bar++) {
     openHiHatBeats.forEach((openHiHatBeat) => {
       addNewBeatToTrack(
-        newOpenHiHatTrack.beats.length,
         "OH",
         ["C1"],
-        "8n",
         `+${bar}:${openHiHatBeat}`,
-        newOpenHiHatTrack
+        newOpenHiHatTrack,
+        0.25,
+        newOpenHiHatTrack.beats.length === 0
+          ? []
+          : [BEAT_LENGTH_TO_MIDI["0.25"]]
       );
     });
   }
@@ -251,12 +273,12 @@ const generateOpenHiHatTrack = (synth: TrackSynth): TrackData => {
   openHiHatBeats = [1, 3];
   openHiHatBeats.forEach((openHiHatBeat) => {
     addNewBeatToTrack(
-      newOpenHiHatTrack.beats.length,
       "OH",
       ["C1"],
-      "8n",
       `+${3}:${openHiHatBeat}`,
-      newOpenHiHatTrack
+      newOpenHiHatTrack,
+      0.25,
+      newOpenHiHatTrack.beats.length === 0 ? [] : [BEAT_LENGTH_TO_MIDI["0.25"]]
     );
   });
 
@@ -276,17 +298,20 @@ const generateBassTrack = (
     }
   }
 
+  let beatsSinceLastNote = [];
+
   for (let i = 0; i < chords.length; i++) {
     const chordNotes = chords[i];
 
     addNewBeatToTrack(
-      newBassTrack.beats.length,
       `${chords[i][0].slice(0, -1)}2`,
       [`${chords[i][0].slice(0, -1)}2`],
-      "8n",
       `+${i}:0`,
-      newBassTrack
+      newBassTrack,
+      0.25,
+      beatsSinceLastNote
     );
+    beatsSinceLastNote = [];
 
     let nextBeatLength = getABeatLength();
     let currentBeat = 1;
@@ -297,13 +322,16 @@ const generateBassTrack = (
         ].slice(0, -1)}2`;
 
         addNewBeatToTrack(
-          newBassTrack.beats.length,
           randomNote,
           [randomNote],
-          BEAT_LENGTH_TO_TONE_LENGTH[nextBeatLength],
           beatToTriggerTime(currentBeat + i * BEATS_PER_BAR),
-          newBassTrack
+          newBassTrack,
+          Number(nextBeatLength),
+          beatsSinceLastNote
         );
+        beatsSinceLastNote = [];
+      } else {
+        beatsSinceLastNote.push(BEAT_LENGTH_TO_MIDI[nextBeatLength]);
       }
 
       currentBeat += Number(nextBeatLength);

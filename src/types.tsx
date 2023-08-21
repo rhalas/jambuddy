@@ -49,6 +49,8 @@ export type Beat = {
   beatData: Array<string>;
   length: string;
   triggerTime: string;
+  beatLength: number;
+  beatsSinceLastNote: Array<string>;
 };
 
 export interface SamplePlayers {
