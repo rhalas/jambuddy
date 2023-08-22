@@ -9,8 +9,7 @@ export const addNewBeatToTrack = (
   beatData: Array<string>,
   triggerTime: string,
   track: TrackData,
-  beatLength: number,
-  beatsSinceLastNote: Array<string>
+  beatLength: number
 ) => {
   const newBeat = {
     beatNumber: track.beats.length,
@@ -19,7 +18,6 @@ export const addNewBeatToTrack = (
     length: BEAT_LENGTH_TO_TONE_LENGTH[beatLength],
     triggerTime: triggerTime,
     beatLength: beatLength,
-    beatsSinceLastNote: beatsSinceLastNote,
   };
 
   track.beats.push(newBeat);

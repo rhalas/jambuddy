@@ -25,7 +25,6 @@ export type Beat = {
   length: string;
   triggerTime: string;
   beatLength: number;
-  beatsSinceLastNote: Array<string>;
 };
 
 export interface SamplePlayers {
@@ -62,6 +61,10 @@ export interface Progressions {
 
 export interface BeatToneLength {
   [key: string]: string;
+}
+
+export interface ToneToEighths {
+  [key: string]: number;
 }
 
 export type KeyInfo = {

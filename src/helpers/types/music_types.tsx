@@ -1,4 +1,10 @@
-import { Scales, Progressions, ChordUrl, BeatToneLength } from "./types";
+import {
+  Scales,
+  Progressions,
+  ChordUrl,
+  BeatToneLength,
+  ToneToEighths,
+} from "./types";
 
 export const BEATS_PER_BAR = 4;
 export const NUMBER_OF_BEATS = 16;
@@ -14,12 +20,12 @@ export const BEAT_LENGTH_TO_TONE_LENGTH: BeatToneLength = {
   "0.5": "8n",
   "0.25": "8n",
 };
-export const BEAT_LENGTH_TO_MIDI: BeatToneLength = {
-  "4": "1",
-  "1": "4",
-  "0.5": "8",
-  "0.25": "8",
+export const TONE_LENGTHS_TO_EIGHTH_NOTES: ToneToEighths = {
+  "1n": 8,
+  "4n": 2,
+  "8n": 1,
 };
+
 export const notes: Array<string> = [
   "Ab",
   "A",
