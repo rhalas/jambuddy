@@ -60,8 +60,8 @@ export const exportToMidi = (tracks: Array<TrackData>, tempo: number) => {
       previousTrigger = beat.triggerTime;
 
       const note = new MidiWriter.NoteEvent({
-        pitch: beat.beatData,
-        duration: beat.length.charAt(0),
+        pitch: beat.beatData as MidiWriter.Pitch[],
+        duration: beat.length.charAt(0) as MidiWriter.Duration,
         wait: beatsToWait,
       });
       midiTrack.addEvent(note);
