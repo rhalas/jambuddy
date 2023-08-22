@@ -26,6 +26,7 @@ import { makeTrackLoop } from "../helpers/music/sounds";
 import { makeRandomProgression } from "../helpers/music/music";
 import { Sequencer } from "./sequencer";
 import { SongInfo } from "./song_info";
+import { Button, Text } from "@radix-ui/themes";
 
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();
@@ -123,7 +124,9 @@ function App() {
     <>
       <div>
         {tracks.length === 0 ? (
-          <button onClick={generateNewProgression}>Play a song</button>
+          <Button size="4" variant="classic" onClick={generateNewProgression}>
+            <Text>Play a song</Text>
+          </Button>
         ) : (
           <>
             <SongInfo

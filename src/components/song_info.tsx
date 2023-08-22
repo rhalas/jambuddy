@@ -1,7 +1,7 @@
 import { KeyInfo, ChordInfo, TrackData } from "../helpers/types/types";
 import styled from "styled-components";
 import { exportToMidi } from "../helpers/music/midi";
-
+import { Button, Text } from "@radix-ui/themes";
 const SongInfoContainer = styled.div``;
 const KeyInfoContainer = styled.div``;
 const ProgressionContainer = styled.div``;
@@ -18,20 +18,26 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
   return (
     <SongInfoContainer>
       <KeyInfoContainer>
-        Key: {songKey.rootNote} {songKey.progression}
+        <Text>
+          Key: {songKey.rootNote} {songKey.progression}
+        </Text>
       </KeyInfoContainer>
       <ProgressionContainer>
-        Chord Progression:{" "}
-        {progression &&
-          progression.map((p: ChordInfo) => p.position).join(" - ")}
+        <Text>
+          Chord Progression:{" "}
+          {progression &&
+            progression.map((p: ChordInfo) => p.position).join(" - ")}
+        </Text>
       </ProgressionContainer>
-      <button
+      <Button
+        size="3"
+        variant="classic"
         onClick={() => {
           exportToMidi(tracks, tempo);
         }}
       >
-        Export MIDI
-      </button>
+        <Text>Export MIDI</Text>
+      </Button>
     </SongInfoContainer>
   );
 };
