@@ -1,38 +1,28 @@
-import { ProgressionInfo, ChordInfo, TrackData } from "../helpers/types/types";
+import { ProgressionDetails } from "../helpers/types/types";
 import styled from "styled-components";
 import { exportToMidi } from "../helpers/music/midi";
 import { Button, Text, Flex } from "@radix-ui/themes";
+import { ProgressionInfo } from "./progressionInfo";
 
 const SongInfoContainer = styled.div``;
-const KeyInfoContainer = styled.div``;
-const ProgressionContainer = styled.div`
-  margin-bottom: 15px;
-`;
 
 type SongInfoProps = {
-  songKey?: ProgressionInfo;
-  tracks: Array<TrackData>;
+  progressions: Array<ProgressionDetails>;
+  playingIndex: number;
   tempo: number;
   addNewChordCallback: () => void;
 };
 
 export const SongInfo = (songInfoProps: SongInfoProps) => {
-  const { songKey, tracks, tempo, addNewChordCallback } = songInfoProps;
+  const { progressions, playingIndex, tempo, addNewChordCallback } =
+    songInfoProps;
   return (
-    songKey && (
+    progressions && (
       <SongInfoContainer>
-        <KeyInfoContainer>
-          <Text>
-            Key: {songKey.rootNote} {songKey.mode}
-          </Text>
-        </KeyInfoContainer>
-        <ProgressionContainer>
-          <Text>
-            Chord Progression:{" "}
-            {songKey.progression &&
-              songKey.progression.map((p: ChordInfo) => p.position).join(" - ")}
-          </Text>
-        </ProgressionContainer>
+        <ProgressionInfo
+          progressions={progressions}
+          playingIndex={playingIndex}
+        />
         <Flex justify="center" align="center" gap="9" style={{ height: 40 }}>
           <Button
             size="3"
@@ -47,7 +37,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
             size="3"
             variant="classic"
             onClick={() => {
-              exportToMidi(tracks, tempo);
+              exportToMidi(progressions[playingIndex].tracks, tempo);
             }}
           >
             <Text>Export MIDI</Text>

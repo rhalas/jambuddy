@@ -13,7 +13,6 @@ export type SongInfo = {
   bassTrack: TrackData;
   snareDrumTrack: TrackData;
   guitarRhythmTrack: TrackData;
-  progression: Array<ChordInfo>;
   closedHiHatTrack: TrackData;
   openHiHatTrack: TrackData;
 };
@@ -67,10 +66,12 @@ export interface ToneToEighths {
   [key: string]: number;
 }
 
-export type ProgressionInfo = {
+export type ProgressionDetails = {
   rootNote: string;
   mode: string;
   progression: ChordInfo[];
+  scale: Array<string>;
+  tracks: Array<TrackData>;
 };
 
 export type SongSynths = {

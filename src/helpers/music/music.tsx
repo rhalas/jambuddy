@@ -6,6 +6,7 @@ import {
   SongSynths,
   TrackSynth,
   Beat,
+  ProgressionDetails,
 } from "../types/types";
 import {
   NUMBER_OF_BARS,
@@ -20,7 +21,7 @@ import {
 import { makeNewTrack, addNewBeatToTrack } from "../utils/track_utils";
 import * as Tone from "tone";
 
-const generatedRandomProgression = (
+export const generatedRandomProgression = (
   chordDetails: Array<ChordInfo>
 ): Array<ChordInfo> => {
   const chordProgression: Array<ChordInfo> = [];
@@ -283,7 +284,7 @@ const generateGuitarRhythmTrack = async (
   return newGuitarRhythmTrack;
 };
 
-const generateScaleNotes = (songKey: ProgressionInfo) => {
+export const generateScaleNotes = (songKey: ProgressionInfo) => {
   const rootPosition = notes.indexOf(songKey.rootNote);
   const scaleFormula = scales[songKey.mode];
 
@@ -310,7 +311,7 @@ const getChordName = (currentPosition: string, rootNote: string) => {
   return chordName;
 };
 
-const generateChordDetails = (
+export const generateChordDetails = (
   scaleNotes: Array<string>,
   progression: string
 ): Array<ChordInfo> => {
@@ -344,22 +345,25 @@ const generateChordDetails = (
 };
 
 export const createSongTracks = async (
-  progressionInfo: ProgressionInfo,
+  progressionDetails: ProgressionDetails,
   songSynths: SongSynths
 ): Promise<SongInfo> => {
-  const scale = generateScaleNotes(progressionInfo);
-  const chordDetails = generateChordDetails(scale, progressionInfo.mode);
-
-  const progression = generatedRandomProgression(chordDetails);
-  const rhythmTrack = generateRhythmTrack(progression, songSynths.rhythm);
-
-  const melodyTrack = generateMelodyTrack(songSynths.lead, scale);
+  const rhythmTrack = generateRhythmTrack(
+    progressionDetails.progression,
+    songSynths.rhythm
+  );
+  const melodyTrack = generateMelodyTrack(
+    songSynths.lead,
+    progressionDetails.scale
+  );
   const bassDrumTrack = generateBassDrumTrack(songSynths.bassDrum);
   const snareDrumTrack = generateSnareDrumTrack(songSynths.snareDrum);
   const closedHiHatTrack = generateClosedHiHatTrack(songSynths.closedHiHat);
   const openHiHatTrack = generateOpenHiHatTrack(songSynths.openHiHat);
   const bassTrack = generateBassTrack(songSynths.bass, rhythmTrack);
-  const guitarRhythmTrack = await generateGuitarRhythmTrack(progression);
+  const guitarRhythmTrack = await generateGuitarRhythmTrack(
+    progressionDetails.progression
+  );
 
   return {
     rhythmTrack: rhythmTrack,
@@ -368,7 +372,6 @@ export const createSongTracks = async (
     bassTrack: bassTrack,
     snareDrumTrack: snareDrumTrack,
     guitarRhythmTrack: guitarRhythmTrack,
-    progression: progression,
     closedHiHatTrack: closedHiHatTrack,
     openHiHatTrack: openHiHatTrack,
   };

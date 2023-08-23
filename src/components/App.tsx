@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import * as Tone from "tone";
 import {
@@ -10,7 +10,11 @@ import {
   makeClosedHiHat,
   makeOpenHiHat,
 } from "../helpers/music/synths";
-import { TrackData, ProgressionInfo, SongSynths } from "../helpers/types/types";
+import {
+  TrackData,
+  ProgressionDetails,
+  SongSynths,
+} from "../helpers/types/types";
 import {
   MAX_TEMPO,
   MIN_TEMPO,
@@ -18,29 +22,27 @@ import {
   progressions,
 } from "../helpers/types/music_types";
 import { makeTrackLoop } from "../helpers/music/sounds";
-import { createSongTracks } from "../helpers/music/music";
+import {
+  createSongTracks,
+  generateScaleNotes,
+  generatedRandomProgression,
+  generateChordDetails,
+} from "../helpers/music/music";
 import { Sequencer } from "./sequencer";
-import { SongInfo } from "./song_info";
+import { SongInfo } from "./songInfo";
 import { Button, Text } from "@radix-ui/themes";
 
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();
-
-  const [progressionInfo, setProgressionInfo] = useState<
-    Array<ProgressionInfo>
+  const [createdProgressions, setCreatedProgressions] = useState<
+    Array<ProgressionDetails>
   >([]);
-  const [processingProgressionIndex, setProcessingProgressionIndex] =
-    useState<number>(-1);
-
   const [playingProgressionIndex, setPlayingProgressionIndex] =
     useState<number>(0);
-
   const [initNew, setInitNew] = useState<boolean>(true);
-
+  const [ranCheckThisBar, setRanCheckThisBar] = useState<boolean>(false);
   const [tempo, setTempo] = useState<number>(-1);
-  const [loops, setLoops] = useState<Array<Tone.Loop>>();
-
-  const [tracks, setTracks] = useState<Array<TrackData>>([]);
+  const [loops, setLoops] = useState<Array<Tone.Loop>>([]);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
 
   const initAudio = async () => {
@@ -67,32 +69,72 @@ function App() {
     const listOfModes = Object.keys(progressions);
     const newMode = listOfModes[Math.floor(Math.random() * listOfModes.length)];
 
-    const newProgressionInfo = {
+    const newProgressionDetail: ProgressionDetails = {
       rootNote: rootNote,
       mode: newMode,
       progression: [],
+      scale: [],
+      tracks: [],
     };
 
-    setProgressionInfo((s) => [...s, newProgressionInfo]);
-    setProcessingProgressionIndex((p) => p + 1);
+    const scale = generateScaleNotes(newProgressionDetail);
+    const chordDetails = generateChordDetails(scale, newProgressionDetail.mode);
+    const progression = generatedRandomProgression(chordDetails);
+
+    newProgressionDetail.progression = progression;
+    newProgressionDetail.scale = scale;
+
+    setCreatedProgressions((s) => [...s, newProgressionDetail]);
   };
 
+  const prepareNextLoop = useCallback(
+    (newTracks: Array<TrackData>) => {
+      const newLoops: Array<Tone.Loop> = [];
+      newTracks.forEach((track) => {
+        if (track.synth) {
+          newLoops.push(makeTrackLoop(track.synth, track.beats));
+        }
+      });
+
+      loops.forEach((loop) => {
+        loop.stop();
+      });
+      setLoops(newLoops);
+    },
+    [loops]
+  );
+
   useEffect(() => {
-    if (
-      beatNumber % 16 == 0 &&
-      playingProgressionIndex < progressionInfo.length - 1
-    ) {
-      setPlayingProgressionIndex((s) => s + 1);
+    if (beatNumber % 16 == 0) {
+      if (
+        !ranCheckThisBar &&
+        playingProgressionIndex < createdProgressions.length - 1
+      ) {
+        prepareNextLoop(
+          createdProgressions[playingProgressionIndex + 1].tracks
+        );
+        setPlayingProgressionIndex((s) => s + 1);
+        setRanCheckThisBar(true);
+      }
+    } else {
+      setRanCheckThisBar(false);
     }
-  }, [beatNumber, progressionInfo, playingProgressionIndex]);
+  }, [
+    beatNumber,
+    createdProgressions,
+    playingProgressionIndex,
+    ranCheckThisBar,
+    prepareNextLoop,
+  ]);
 
   useEffect(() => {
     if (
-      progressionInfo.length > 0 &&
-      processingProgressionIndex >= 0 &&
+      createdProgressions.length > 0 &&
+      playingProgressionIndex >= 0 &&
       initNew
     ) {
-      const processingProgression = progressionInfo[processingProgressionIndex];
+      const indexToModify = createdProgressions.length - 1;
+      const processingProgression = createdProgressions[indexToModify];
 
       const getSongInfo = async () => {
         const newSongInfo = await createSongTracks(
@@ -117,68 +159,54 @@ function App() {
             Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
         }
 
-        const newLoops: Array<Tone.Loop> = [];
-        newTracks.forEach((track) => {
-          if (track.synth) {
-            newLoops.push(makeTrackLoop(track.synth, track.beats));
-          }
-        });
-
-        if (loops && loops.length > 0) {
-          loops.forEach((loop) => {
-            loop.stop();
-          });
+        if (playingProgressionIndex == 0) {
+          prepareNextLoop(newTracks);
         }
 
         Tone.Transport.bpm.value = tempoToUse;
         Tone.Transport.start();
 
-        setTempo(tempoToUse);
-        setTracks(newTracks);
-        setLoops(newLoops);
-        setInitNew(false);
+        const updatedProgressions = [...createdProgressions];
+        updatedProgressions[indexToModify].tracks = newTracks;
 
-        const updatedProgression = [...progressionInfo];
-        updatedProgression[processingProgressionIndex].progression =
-          newSongInfo.progression;
-        setProgressionInfo(updatedProgression);
+        setCreatedProgressions(updatedProgressions);
+        setTempo(tempoToUse);
+        setInitNew(false);
       };
 
       getSongInfo();
     }
   }, [
     songSynths,
-    progressionInfo,
-    processingProgressionIndex,
-    tracks,
+    createdProgressions,
+    playingProgressionIndex,
     initNew,
     loops,
     tempo,
+    prepareNextLoop,
   ]);
 
   return (
     <>
       <div>
-        {tracks.length === 0 ? (
+        {createdProgressions.length === 0 ? (
           <Button size="4" variant="classic" onClick={initAudio}>
             <Text>Play a song</Text>
           </Button>
         ) : (
           <>
             <SongInfo
-              songKey={
-                playingProgressionIndex <= progressionInfo.length
-                  ? progressionInfo[playingProgressionIndex]
-                  : undefined
-              }
-              tracks={tracks}
+              progressions={createdProgressions}
+              playingIndex={playingProgressionIndex}
               tempo={tempo}
               addNewChordCallback={() => {
                 setInitNew(true);
                 generateNewProgression();
               }}
             />
-            <Sequencer tracks={tracks} />
+            <Sequencer
+              tracks={createdProgressions[playingProgressionIndex].tracks}
+            />
           </>
         )}
       </div>
