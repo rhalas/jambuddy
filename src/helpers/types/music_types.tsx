@@ -11,7 +11,7 @@ export const NUMBER_OF_BEATS = 16;
 export const NUMBER_OF_BARS = NUMBER_OF_BEATS / BEATS_PER_BAR;
 
 export const MAX_TEMPO = 160;
-export const MIN_TEMPO = 160;
+export const MIN_TEMPO = 100;
 
 export const BEAT_LENGTHS = ["1", "0.5"];
 export const BEAT_LENGTH_TO_TONE_LENGTH: BeatToneLength = {

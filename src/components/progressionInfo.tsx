@@ -25,6 +25,10 @@ const ProgressionContainer = styled.div<{ isActive: boolean }>`
   background-color: ${(p) => (p.isActive ? "white" : "#D3D3D3")};
 `;
 
+const CarouselBox = styled(Swiper)``;
+
+const SwiperSlideContainer = styled(SwiperSlide)``;
+
 type ProgressionInfoProps = {
   progressions: Array<ProgressionDetails>;
   playingIndex: number;
@@ -42,7 +46,7 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
 
   return (
     <ProgressionInfoContainer>
-      <Swiper
+      <CarouselBox
         slidesPerView={5}
         centeredSlides={true}
         spaceBetween={30}
@@ -53,24 +57,31 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
         ref={sliderRef}
       >
         {progressions.map((p, i) => (
-          <SwiperSlide>
+          <SwiperSlideContainer>
             <ProgressionContainer isActive={i === playingIndex}>
               <KeyInfoContainer>
                 <Text>
-                  Key: {p.rootNote} {p.mode}
+                  {p.rootNote} {p.mode}
                 </Text>
               </KeyInfoContainer>
               <ChordContainer>
                 <Text>
-                  Chord Progression:{" "}
                   {p.progression &&
                     p.progression.map((c: ChordInfo) => c.position).join(" - ")}
                 </Text>
+                <div>
+                  <Text>
+                    {p.progression &&
+                      p.progression
+                        .map((c: ChordInfo) => c.chordName)
+                        .join(" - ")}
+                  </Text>
+                </div>
               </ChordContainer>
             </ProgressionContainer>
-          </SwiperSlide>
+          </SwiperSlideContainer>
         ))}
-      </Swiper>
+      </CarouselBox>
     </ProgressionInfoContainer>
   );
 };
