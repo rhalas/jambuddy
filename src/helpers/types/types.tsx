@@ -67,9 +67,10 @@ export interface ToneToEighths {
   [key: string]: number;
 }
 
-export type KeyInfo = {
+export type ProgressionInfo = {
   rootNote: string;
-  progression: string;
+  mode: string;
+  progression: ChordInfo[];
 };
 
 export type SongSynths = {

@@ -4,7 +4,6 @@ import { Visualizer } from "./visualizer";
 
 type TrackProps = {
   trackData: TrackData;
-  currentBeat: number;
 };
 
 const TrackContainer = styled.div`

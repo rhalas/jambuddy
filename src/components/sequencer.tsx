@@ -3,12 +3,11 @@ import { Track } from "./track";
 
 type SequencerProps = {
   tracks: Array<TrackData>;
-  currentBeat: number;
 };
 
 export const Sequencer = (sequencerProps: SequencerProps) => {
-  const { tracks, currentBeat } = sequencerProps;
+  const { tracks } = sequencerProps;
   return tracks.map((track) => {
-    return <Track trackData={track} currentBeat={currentBeat} />;
+    return <Track trackData={track} />;
   });
 };

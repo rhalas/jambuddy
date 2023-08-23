@@ -10,12 +10,7 @@ import {
   makeClosedHiHat,
   makeOpenHiHat,
 } from "../helpers/music/synths";
-import {
-  ChordInfo,
-  TrackData,
-  KeyInfo,
-  SongSynths,
-} from "../helpers/types/types";
+import { TrackData, ProgressionInfo, SongSynths } from "../helpers/types/types";
 import {
   MAX_TEMPO,
   MIN_TEMPO,
@@ -23,7 +18,7 @@ import {
   progressions,
 } from "../helpers/types/music_types";
 import { makeTrackLoop } from "../helpers/music/sounds";
-import { makeRandomProgression } from "../helpers/music/music";
+import { createSongTracks } from "../helpers/music/music";
 import { Sequencer } from "./sequencer";
 import { SongInfo } from "./song_info";
 import { Button, Text } from "@radix-ui/themes";
@@ -31,111 +26,159 @@ import { Button, Text } from "@radix-ui/themes";
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();
 
-  const [progression, setProgression] = useState<Array<ChordInfo>>([]);
-  const [songReady, setSongReady] = useState<boolean>(false);
+  const [progressionInfo, setProgressionInfo] = useState<
+    Array<ProgressionInfo>
+  >([]);
+  const [processingProgressionIndex, setProcessingProgressionIndex] =
+    useState<number>(-1);
 
-  const [beatNumber, setBeatNumber] = useState<number>(-1);
-  const [tempo, setTempo] = useState<number>(120);
+  const [playingProgressionIndex, setPlayingProgressionIndex] =
+    useState<number>(0);
+
+  const [initNew, setInitNew] = useState<boolean>(true);
+
+  const [tempo, setTempo] = useState<number>(-1);
+  const [loops, setLoops] = useState<Array<Tone.Loop>>();
 
   const [tracks, setTracks] = useState<Array<TrackData>>([]);
-  const [songKey, setSongKey] = useState<KeyInfo | undefined>();
+  const [beatNumber, setBeatNumber] = useState<number>(-1);
 
-  const [readyToGenerateProgression, setReadyToGenerateProgression] =
-    useState<boolean>(false);
-  const [createAudioContexts, setCreateAudioContexts] =
-    useState<boolean>(false);
-
-  const generateNewProgression = () => {
-    const rootNote = notes[Math.floor(Math.random() * notes.length)];
-    const listOfProgressions = Object.keys(progressions);
-    const newProgression =
-      listOfProgressions[Math.floor(Math.random() * listOfProgressions.length)];
-    const newSongKey = {
-      rootNote: rootNote,
-      progression: newProgression,
+  const initAudio = async () => {
+    const newSongSynths: SongSynths = {
+      rhythm: makeRhythmSynth(),
+      lead: makeLeadSynth(),
+      snareDrum: makeSnareDrum(),
+      bassDrum: makeBassDrum(),
+      bass: makeBassSynth(),
+      closedHiHat: makeClosedHiHat(),
+      openHiHat: makeOpenHiHat(),
     };
-    setSongKey(newSongKey);
-    setCreateAudioContexts(true);
+
+    Tone.Transport.scheduleRepeat(() => {
+      setBeatNumber((beatNumber) => beatNumber + 1);
+    }, `4n`);
+
+    setSongSynths(newSongSynths);
+    await generateNewProgression();
+  };
+
+  const generateNewProgression = async () => {
+    const rootNote = notes[Math.floor(Math.random() * notes.length)];
+    const listOfModes = Object.keys(progressions);
+    const newMode = listOfModes[Math.floor(Math.random() * listOfModes.length)];
+
+    const newProgressionInfo = {
+      rootNote: rootNote,
+      mode: newMode,
+      progression: [],
+    };
+
+    setProgressionInfo((s) => [...s, newProgressionInfo]);
+    setProcessingProgressionIndex((p) => p + 1);
   };
 
   useEffect(() => {
-    if (createAudioContexts) {
-      const newSongSynths: SongSynths = {
-        rhythm: makeRhythmSynth(),
-        lead: makeLeadSynth(),
-        snareDrum: makeSnareDrum(),
-        bassDrum: makeBassDrum(),
-        bass: makeBassSynth(),
-        closedHiHat: makeClosedHiHat(),
-        openHiHat: makeOpenHiHat(),
-      };
-
-      setSongSynths(newSongSynths);
-
-      Tone.Transport.scheduleRepeat(() => {
-        setBeatNumber((beatNumber) => beatNumber + 1);
-      }, `4n`);
-
-      setReadyToGenerateProgression(true);
+    if (
+      beatNumber % 16 == 0 &&
+      playingProgressionIndex < progressionInfo.length - 1
+    ) {
+      setPlayingProgressionIndex((s) => s + 1);
     }
-  }, [createAudioContexts]);
+  }, [beatNumber, progressionInfo, playingProgressionIndex]);
 
   useEffect(() => {
-    if (readyToGenerateProgression && songKey && songSynths) {
+    if (
+      progressionInfo.length > 0 &&
+      processingProgressionIndex >= 0 &&
+      initNew
+    ) {
+      const processingProgression = progressionInfo[processingProgressionIndex];
+
       const getSongInfo = async () => {
-        const songInfo = await makeRandomProgression(songKey, songSynths);
+        const newSongInfo = await createSongTracks(
+          processingProgression,
+          songSynths!
+        );
 
         const newTracks = [
-          songInfo.rhythmTrack,
-          songInfo.melodyTrack,
-          songInfo.bassTrack,
-          songInfo.guitarRhythmTrack,
-          songInfo.bassDrumTrack,
-          songInfo.snareDrumTrack,
-          songInfo.openHiHatTrack,
-          songInfo.closedHiHatTrack,
+          newSongInfo.rhythmTrack,
+          newSongInfo.melodyTrack,
+          newSongInfo.bassTrack,
+          newSongInfo.guitarRhythmTrack,
+          newSongInfo.bassDrumTrack,
+          newSongInfo.snareDrumTrack,
+          newSongInfo.openHiHatTrack,
+          newSongInfo.closedHiHatTrack,
         ];
 
+        let tempoToUse = tempo;
+        if (tempoToUse === -1) {
+          tempoToUse =
+            Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
+        }
+
+        const newLoops: Array<Tone.Loop> = [];
+        newTracks.forEach((track) => {
+          if (track.synth) {
+            newLoops.push(makeTrackLoop(track.synth, track.beats));
+          }
+        });
+
+        if (loops && loops.length > 0) {
+          loops.forEach((loop) => {
+            loop.stop();
+          });
+        }
+
+        Tone.Transport.bpm.value = tempoToUse;
+        Tone.Transport.start();
+
+        setTempo(tempoToUse);
         setTracks(newTracks);
-        setProgression(songInfo.progression);
-        setSongReady(true);
+        setLoops(newLoops);
+        setInitNew(false);
+
+        const updatedProgression = [...progressionInfo];
+        updatedProgression[processingProgressionIndex].progression =
+          newSongInfo.progression;
+        setProgressionInfo(updatedProgression);
       };
 
       getSongInfo();
     }
-  }, [readyToGenerateProgression, songKey, songSynths]);
-
-  useEffect(() => {
-    if (songReady) {
-      const newTempo =
-        Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
-      setTempo(newTempo);
-      const newLoops: Array<Tone.Loop> = [];
-      tracks.forEach((track) => {
-        if (track.synth) {
-          newLoops.push(makeTrackLoop(track.synth, track.beats, newTempo));
-        }
-      });
-      Tone.Transport.start();
-    }
-  }, [songReady, tracks]);
+  }, [
+    songSynths,
+    progressionInfo,
+    processingProgressionIndex,
+    tracks,
+    initNew,
+    loops,
+    tempo,
+  ]);
 
   return (
     <>
       <div>
         {tracks.length === 0 ? (
-          <Button size="4" variant="classic" onClick={generateNewProgression}>
+          <Button size="4" variant="classic" onClick={initAudio}>
             <Text>Play a song</Text>
           </Button>
         ) : (
           <>
             <SongInfo
-              songKey={songKey!}
-              progression={progression}
+              songKey={
+                playingProgressionIndex <= progressionInfo.length
+                  ? progressionInfo[playingProgressionIndex]
+                  : undefined
+              }
               tracks={tracks}
               tempo={tempo}
+              addNewChordCallback={() => {
+                setInitNew(true);
+                generateNewProgression();
+              }}
             />
-            <Sequencer tracks={tracks} currentBeat={beatNumber} />
+            <Sequencer tracks={tracks} />
           </>
         )}
       </div>

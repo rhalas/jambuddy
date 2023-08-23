@@ -4,11 +4,8 @@ import { NUMBER_OF_BARS } from "../types/music_types";
 
 export const makeTrackLoop = (
   synth: TrackSynth,
-  beats: Array<Beat>,
-  trackTempo: number
+  beats: Array<Beat>
 ): Tone.Loop => {
-  Tone.Transport.bpm.value = trackTempo;
-
   const loop = new Tone.Loop(() => {
     beats.forEach((beat) => {
       if (beat.length) {

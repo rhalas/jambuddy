@@ -2,7 +2,7 @@ import {
   ChordInfo,
   SongInfo,
   TrackData,
-  KeyInfo,
+  ProgressionInfo,
   SongSynths,
   TrackSynth,
   Beat,
@@ -283,9 +283,9 @@ const generateGuitarRhythmTrack = async (
   return newGuitarRhythmTrack;
 };
 
-const generateScaleNotes = (songKey: KeyInfo) => {
+const generateScaleNotes = (songKey: ProgressionInfo) => {
   const rootPosition = notes.indexOf(songKey.rootNote);
-  const scaleFormula = scales[songKey.progression];
+  const scaleFormula = scales[songKey.mode];
 
   const notesInScale: Array<string> = [];
   let totalDelta = rootPosition;
@@ -343,12 +343,12 @@ const generateChordDetails = (
   return chordProgression;
 };
 
-export const makeRandomProgression = async (
-  songKey: KeyInfo,
+export const createSongTracks = async (
+  progressionInfo: ProgressionInfo,
   songSynths: SongSynths
 ): Promise<SongInfo> => {
-  const scale = generateScaleNotes(songKey);
-  const chordDetails = generateChordDetails(scale, songKey.progression);
+  const scale = generateScaleNotes(progressionInfo);
+  const chordDetails = generateChordDetails(scale, progressionInfo.mode);
 
   const progression = generatedRandomProgression(chordDetails);
   const rhythmTrack = generateRhythmTrack(progression, songSynths.rhythm);
