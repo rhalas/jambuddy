@@ -2,11 +2,10 @@ import {
   ChordInfo,
   SongInfo,
   TrackData,
-  ProgressionInfo,
+  ProgressionDetails,
   SongSynths,
   TrackSynth,
   Beat,
-  ProgressionDetails,
 } from "../types/types";
 import {
   NUMBER_OF_BARS,
@@ -284,7 +283,7 @@ const generateGuitarRhythmTrack = async (
   return newGuitarRhythmTrack;
 };
 
-export const generateScaleNotes = (songKey: ProgressionInfo) => {
+export const generateScaleNotes = (songKey: ProgressionDetails) => {
   const rootPosition = notes.indexOf(songKey.rootNote);
   const scaleFormula = scales[songKey.mode];
 
