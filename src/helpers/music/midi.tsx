@@ -1,6 +1,6 @@
 import MidiWriter from "midi-writer-js";
 import { TrackData } from "../types/types";
-import { TONE_LENGTHS_TO_EIGHTH_NOTES, Beat } from "../types/music_types";
+import { TONE_LENGTHS_TO_EIGHTH_NOTES } from "../types/music_types";
 
 const downloadURI = (uri: string, name: string) => {
   const link = document.createElement("a");

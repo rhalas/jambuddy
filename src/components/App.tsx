@@ -45,7 +45,7 @@ function App() {
   const [tempo, setTempo] = useState<number>(-1);
   const [loops, setLoops] = useState<Array<Tone.Loop>>([]);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
-  const [newKey, setNewKey] = useState<boolean>(true);
+  //const [newKey, setNewKey] = useState<boolean>(true);
 
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
 
@@ -134,18 +134,17 @@ function App() {
       tracks: [],
     };
 
-    if (newKey) {
-      const rootNote = notes[Math.floor(Math.random() * notes.length)];
-      const listOfModes = Object.keys(progressions);
-      const newMode =
-        listOfModes[Math.floor(Math.random() * listOfModes.length)];
+    const rootNote = notes[Math.floor(Math.random() * notes.length)];
+    const listOfModes = Object.keys(progressions);
+    const newMode = listOfModes[Math.floor(Math.random() * listOfModes.length)];
 
-      newProgressionDetail.rootNote = rootNote;
-      newProgressionDetail.mode = newMode;
-    } else {
+    newProgressionDetail.rootNote = rootNote;
+    newProgressionDetail.mode = newMode;
+
+    /*
       newProgressionDetail.rootNote = createdProgressions[0].rootNote;
       newProgressionDetail.mode = createdProgressions[0].mode;
-    }
+    */
 
     const scale = generateScaleNotes(newProgressionDetail);
     const chordDetails = generateChordDetails(scale, newProgressionDetail.mode);
