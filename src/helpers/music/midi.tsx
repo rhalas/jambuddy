@@ -1,6 +1,6 @@
 import MidiWriter from "midi-writer-js";
 import { TrackData } from "../types/types";
-import { TONE_LENGTHS_TO_EIGHTH_NOTES } from "../types/music_types";
+import { TONE_LENGTHS_TO_EIGHTH_NOTES, Beat } from "../types/music_types";
 
 const downloadURI = (uri: string, name: string) => {
   const link = document.createElement("a");
@@ -35,6 +35,34 @@ const midiBeatsBetweenTimes = (
   return beatsToWait;
 };
 
+export const makeTrackMidiNotes = (
+  beats: Array<Beat>
+): Array<MidiWriter.NoteEvent> => {
+  const notes: Array<MidiWriter.NoteEvent> = [];
+
+  let previousTrigger = "+0:0";
+  let previousBeatLength = 0;
+
+  beats.forEach((beat) => {
+    const beatsToWait = midiBeatsBetweenTimes(
+      previousBeatLength,
+      previousTrigger,
+      beat.triggerTime
+    );
+    previousBeatLength = TONE_LENGTHS_TO_EIGHTH_NOTES[beat.length];
+    previousTrigger = beat.triggerTime;
+
+    const note = new MidiWriter.NoteEvent({
+      pitch: beat.beatData as MidiWriter.Pitch[],
+      duration: beat.length.charAt(0) as MidiWriter.Duration,
+      wait: beatsToWait,
+    });
+    notes.push(note);
+  });
+
+  return notes;
+};
+
 export const exportToMidi = (tracks: Array<TrackData>, tempo: number) => {
   const midiTracks: Array<MidiWriter.Track> = [];
 
@@ -47,23 +75,8 @@ export const exportToMidi = (tracks: Array<TrackData>, tempo: number) => {
     midiTrack.setTempo(tempo, 0);
     midiTrack.addEvent(new MidiWriter.ProgramChangeEvent({ instrument: 1 }));
 
-    let previousTrigger = "+0:0";
-    let previousBeatLength = 0;
-
-    track.beats.forEach((beat) => {
-      const beatsToWait = midiBeatsBetweenTimes(
-        previousBeatLength,
-        previousTrigger,
-        beat.triggerTime
-      );
-      previousBeatLength = TONE_LENGTHS_TO_EIGHTH_NOTES[beat.length];
-      previousTrigger = beat.triggerTime;
-
-      const note = new MidiWriter.NoteEvent({
-        pitch: beat.beatData as MidiWriter.Pitch[],
-        duration: beat.length.charAt(0) as MidiWriter.Duration,
-        wait: beatsToWait,
-      });
+    const notes = makeTrackMidiNotes(track.beats);
+    notes.forEach((note) => {
       midiTrack.addEvent(note);
     });
 

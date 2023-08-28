@@ -64,6 +64,29 @@ export const makeLeadSynth = (): TrackSynth => {
   return { polySynth: newLeadSynth, meter: meter, fft: fft };
 };
 
+export const makeVocalSynth = (): TrackSynth => {
+  const meter = new Tone.Meter();
+  const fft = new Tone.FFT(64);
+
+  const newVocalSynth = new Tone.PolySynth(Tone.Synth, {
+    volume: -12,
+    oscillator: {
+      type: "square",
+    },
+    portamento: 0.005,
+  })
+    .fan(meter, fft)
+    .toDestination();
+
+  const reverb = new Tone.Reverb({
+    decay: 10.0,
+    preDelay: 0.01,
+  }).toDestination();
+  newVocalSynth.connect(reverb);
+
+  return { polySynth: newVocalSynth, meter: meter, fft: fft };
+};
+
 export const makeRhythmSynth = (): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);

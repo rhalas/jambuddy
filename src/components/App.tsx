@@ -9,6 +9,7 @@ import {
   makeBassSynth,
   makeClosedHiHat,
   makeOpenHiHat,
+  makeVocalSynth,
 } from "../helpers/music/synths";
 import {
   TrackData,
@@ -31,6 +32,7 @@ import {
 import { Sequencer } from "./sequencer";
 import { SongInfo } from "./songInfo";
 import { Button, Text } from "@radix-ui/themes";
+import { WebMidi, Output } from "webmidi";
 
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();
@@ -43,15 +45,20 @@ function App() {
   const [tempo, setTempo] = useState<number>(-1);
   const [loops, setLoops] = useState<Array<Tone.Loop>>([]);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
+  const [newKey, setNewKey] = useState<boolean>(true);
 
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
+
+  const [webMidiOutput, setWebMidiOut] = useState<Output | undefined>();
 
   const prepareNextLoop = useCallback(
     (newTracks: Array<TrackData>) => {
       const newLoops: Array<Tone.Loop> = [];
-      newTracks.forEach((track) => {
+      newTracks.forEach((track, index) => {
         if (track.synth) {
-          newLoops.push(makeTrackLoop(track.synth, track.beats));
+          newLoops.push(
+            makeTrackLoop(track.synth, track.beats, webMidiOutput, index + 1)
+          );
         }
       });
 
@@ -60,7 +67,7 @@ function App() {
       });
       setLoops(newLoops);
     },
-    [loops]
+    [loops, webMidiOutput]
   );
 
   useEffect(() => {
@@ -89,10 +96,20 @@ function App() {
     loopOnDeck,
   ]);
 
+  const onEnabled = async () => {
+    const output = WebMidi.outputs[0];
+    setWebMidiOut(output);
+  };
+
   const initAudio = async () => {
+    WebMidi.enable()
+      .then(onEnabled)
+      .catch((err) => alert(err));
+
     const newSongSynths: SongSynths = {
       rhythm: makeRhythmSynth(),
       lead: makeLeadSynth(),
+      vocal: makeVocalSynth(),
       snareDrum: makeSnareDrum(),
       bassDrum: makeBassDrum(),
       bass: makeBassSynth(),
@@ -109,17 +126,26 @@ function App() {
   };
 
   const generateNewProgression = async (synths: SongSynths) => {
-    const rootNote = notes[Math.floor(Math.random() * notes.length)];
-    const listOfModes = Object.keys(progressions);
-    const newMode = listOfModes[Math.floor(Math.random() * listOfModes.length)];
-
     const newProgressionDetail: ProgressionDetails = {
-      rootNote: rootNote,
-      mode: newMode,
+      rootNote: "",
+      mode: "",
       progression: [],
       scale: [],
       tracks: [],
     };
+
+    if (newKey) {
+      const rootNote = notes[Math.floor(Math.random() * notes.length)];
+      const listOfModes = Object.keys(progressions);
+      const newMode =
+        listOfModes[Math.floor(Math.random() * listOfModes.length)];
+
+      newProgressionDetail.rootNote = rootNote;
+      newProgressionDetail.mode = newMode;
+    } else {
+      newProgressionDetail.rootNote = createdProgressions[0].rootNote;
+      newProgressionDetail.mode = createdProgressions[0].mode;
+    }
 
     const scale = generateScaleNotes(newProgressionDetail);
     const chordDetails = generateChordDetails(scale, newProgressionDetail.mode);
@@ -139,6 +165,7 @@ function App() {
       newSongInfo.snareDrumTrack,
       newSongInfo.openHiHatTrack,
       newSongInfo.closedHiHatTrack,
+      newSongInfo.vocalTrack,
     ];
 
     newProgressionDetail.tracks = newTracks;

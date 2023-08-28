@@ -15,6 +15,7 @@ export type SongInfo = {
   guitarRhythmTrack: TrackData;
   closedHiHatTrack: TrackData;
   openHiHatTrack: TrackData;
+  vocalTrack: TrackData;
 };
 
 export type Beat = {
@@ -77,6 +78,7 @@ export type ProgressionDetails = {
 export type SongSynths = {
   rhythm: TrackSynth;
   lead: TrackSynth;
+  vocal: TrackSynth;
   snareDrum: TrackSynth;
   bassDrum: TrackSynth;
   bass: TrackSynth;
