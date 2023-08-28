@@ -97,8 +97,10 @@ function App() {
   ]);
 
   const onEnabled = async () => {
-    const output = WebMidi.outputs[0];
-    setWebMidiOut(output);
+    if (WebMidi.outputs.length >= 1) {
+      const output = WebMidi.outputs[0];
+      setWebMidiOut(output);
+    }
   };
 
   const initAudio = async () => {
