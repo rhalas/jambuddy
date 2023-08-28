@@ -2,13 +2,10 @@ import styled from "styled-components";
 import { ProgressionDetails } from "../helpers/types/types";
 import { Text } from "@radix-ui/themes";
 import { ChordInfo } from "../helpers/types/types";
-
-import "swiper/css";
-import "swiper/css/pagination";
-
-import { Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide, SwiperRef } from "swiper/react";
 import { useEffect, useRef } from "react";
+
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 
 const ProgressionInfoContainer = styled.div`
   width: 1000px;
@@ -25,9 +22,7 @@ const ProgressionContainer = styled.div<{ isActive: boolean }>`
   background-color: ${(p) => (p.isActive ? "white" : "#D3D3D3")};
 `;
 
-const CarouselBox = styled(Swiper)``;
-
-const SwiperSlideContainer = styled(SwiperSlide)``;
+const SwiperSlideContainer = styled.div``;
 
 type ProgressionInfoProps = {
   progressions: Array<ProgressionDetails>;
@@ -36,24 +31,40 @@ type ProgressionInfoProps = {
 
 export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
   const { progressions, playingIndex } = progressionInfoProps;
-  const sliderRef = useRef<SwiperRef>(null);
+
+  const sliderRef = useRef<Carousel>(null);
 
   useEffect(() => {
-    if (playingIndex > 0 && sliderRef.current && sliderRef.current.swiper) {
-      sliderRef.current.swiper.slideTo(playingIndex);
+    if (playingIndex > 0 && sliderRef.current && sliderRef.current.state) {
+      sliderRef.current.goToSlide(playingIndex);
     }
   }, [playingIndex]);
 
+  const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 5,
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 3,
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 2,
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1,
+    },
+  };
+
   return (
     <ProgressionInfoContainer>
-      <CarouselBox
-        slidesPerView={5}
-        centeredSlides={true}
-        spaceBetween={30}
-        pagination={{
-          clickable: true,
-        }}
-        modules={[Pagination]}
+      <Carousel
+        centerMode={true}
+        responsive={responsive}
+        showDots={true}
         ref={sliderRef}
       >
         {progressions.map((p, i) => (
@@ -81,7 +92,7 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
             </ProgressionContainer>
           </SwiperSlideContainer>
         ))}
-      </CarouselBox>
+      </Carousel>
     </ProgressionInfoContainer>
   );
 };
