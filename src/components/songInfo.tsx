@@ -48,7 +48,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
               addNewChordCallback();
             }}
           >
-            <Text>Queue up a new song</Text>
+            <Text>Add more music</Text>
           </Button>
           <Button
             size="3"

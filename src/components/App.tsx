@@ -29,10 +29,9 @@ import {
   generatedRandomProgression,
   generateChordDetails,
 } from "../helpers/music/music";
-import { Sequencer } from "./sequencer";
-import { SongInfo } from "./songInfo";
-import { Button, Text } from "@radix-ui/themes";
 import { WebMidi, Output } from "webmidi";
+import { SongPrompt } from "./SongPrompt";
+import { SongPlayer } from "./SongPlayer";
 
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();
@@ -45,7 +44,8 @@ function App() {
   const [tempo, setTempo] = useState<number>(-1);
   const [loops, setLoops] = useState<Array<Tone.Loop>>([]);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
-  //const [newKey, setNewKey] = useState<boolean>(true);
+  const [songTitle, setSongTitle] = useState<string>("");
+  const [lyrics, setLyrics] = useState<Array<string>>();
 
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
 
@@ -98,7 +98,7 @@ function App() {
 
   const onEnabled = async () => {
     if (WebMidi.outputs.length >= 1) {
-      const output = WebMidi.outputs[0];
+      const output = WebMidi.outputs[1];
       setWebMidiOut(output);
     }
   };
@@ -142,11 +142,6 @@ function App() {
 
     newProgressionDetail.rootNote = rootNote;
     newProgressionDetail.mode = newMode;
-
-    /*
-      newProgressionDetail.rootNote = createdProgressions[0].rootNote;
-      newProgressionDetail.mode = createdProgressions[0].mode;
-    */
 
     const scale = generateScaleNotes(newProgressionDetail);
     const chordDetails = generateChordDetails(scale, newProgressionDetail.mode);
@@ -194,23 +189,21 @@ function App() {
   return (
     <div>
       {createdProgressions.length === 0 ? (
-        <Button size="4" variant="classic" onClick={initAudio}>
-          <Text>Play a song</Text>
-        </Button>
+        <SongPrompt
+          promptDoneCallback={initAudio}
+          setSongTitle={setSongTitle}
+          setLyrics={setLyrics}
+        />
       ) : (
-        <>
-          <SongInfo
-            progressions={createdProgressions}
-            playingIndex={playingProgressionIndex}
-            tempo={tempo}
-            addNewChordCallback={() => {
-              generateNewProgression(songSynths!);
-            }}
-          />
-          <Sequencer
-            tracks={createdProgressions[playingProgressionIndex].tracks}
-          />
-        </>
+        <SongPlayer
+          createdProgressions={createdProgressions}
+          playingProgressionIndex={playingProgressionIndex}
+          tempo={tempo}
+          songTitle={songTitle}
+          songSynths={songSynths}
+          generateNewProgression={generateNewProgression}
+          lyrics={lyrics}
+        />
       )}
     </div>
   );
