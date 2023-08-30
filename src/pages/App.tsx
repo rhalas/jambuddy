@@ -30,8 +30,9 @@ import {
   generateChordDetails,
 } from "../helpers/music/music";
 import { WebMidi, Output } from "webmidi";
-import { SongPrompt } from "./SongPrompt";
-import { SongPlayer } from "./SongPlayer";
+import { SongPrompt } from "../components/SongPrompt";
+import { SongPlayer } from "../components/SongPlayer";
+import { LyricLine } from "../helpers/api/api";
 
 function App() {
   const [songSynths, setSongSynths] = useState<SongSynths>();
@@ -45,7 +46,7 @@ function App() {
   const [loops, setLoops] = useState<Array<Tone.Loop>>([]);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
   const [songTitle, setSongTitle] = useState<string>("");
-  const [lyrics, setLyrics] = useState<Array<string>>([]);
+  const [lyrics, setLyrics] = useState<Array<LyricLine>>([]);
 
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
 

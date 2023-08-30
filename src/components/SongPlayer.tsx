@@ -3,6 +3,7 @@ import { SongInfo } from "./songInfo";
 import { Sequencer } from "./sequencer";
 import { ProgressionDetails, SongSynths } from "../helpers/types/types";
 import { Lyrics } from "./Lyrics";
+import { LyricLine } from "../helpers/api/api";
 
 const SongPlayerContainer = styled.div`
   display: flex;
@@ -25,7 +26,7 @@ type SongPlayerProps = {
   songTitle: string;
   songSynths?: SongSynths;
   generateNewProgression: (synths: SongSynths) => void;
-  lyrics: Array<string>;
+  lyrics: Array<LyricLine>;
   currentWord: number;
 };
 

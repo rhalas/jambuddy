@@ -19,6 +19,7 @@ import {
 } from "../types/music_types";
 import { makeNewTrack, addNewBeatToTrack } from "../utils/track_utils";
 import * as Tone from "tone";
+import { LyricLine } from "../api/api";
 
 export const generatedRandomProgression = (
   chordDetails: Array<ChordInfo>
@@ -77,11 +78,9 @@ const beatToTriggerTime = (currentBeat: number): string => {
 
 const generateMelodyTrack = (
   synth: TrackSynth,
-  scaleNotes: Array<string>,
-  variableOctave: boolean,
-  trackName: string
+  scaleNotes: Array<string>
 ): TrackData => {
-  const newMelodyTrack = makeNewTrack(trackName, synth);
+  const newMelodyTrack = makeNewTrack("Melody", synth);
   let nextBeatLength = getABeatLength();
   let currentBeat = 0;
 
@@ -89,10 +88,37 @@ const generateMelodyTrack = (
     let newNote = "";
     if (Math.floor(Math.random() * 2) == 1) {
       const note = scaleNotes[Math.floor(Math.random() * scaleNotes.length)];
-      let octave = 4;
-      if (variableOctave) {
-        octave = Math.floor(Math.random() * 2) + 3;
-      }
+      const octave = Math.floor(Math.random() * 2) + 3;
+      newNote = `${note}${octave}`;
+
+      addNewBeatToTrack(
+        newNote,
+        [newNote],
+        beatToTriggerTime(currentBeat),
+        newMelodyTrack,
+        Number(nextBeatLength)
+      );
+    }
+    currentBeat += Number(nextBeatLength);
+    nextBeatLength = getABeatLength();
+  } while (currentBeat + Number(nextBeatLength) < NUMBER_OF_BEATS);
+
+  return newMelodyTrack;
+};
+
+const generateVocalTrack = (
+  synth: TrackSynth,
+  scaleNotes: Array<string>
+): TrackData => {
+  const newMelodyTrack = makeNewTrack("Vocals", synth);
+  let nextBeatLength = getABeatLength();
+  let currentBeat = 0;
+
+  do {
+    let newNote = "";
+    if (Math.floor(Math.random() * 2) == 1) {
+      const note = scaleNotes[Math.floor(Math.random() * scaleNotes.length)];
+      const octave = 4;
       newNote = `${note}${octave}`;
 
       addNewBeatToTrack(
@@ -358,9 +384,7 @@ export const createSongTracks = async (
   );
   const melodyTrack = generateMelodyTrack(
     songSynths.lead,
-    progressionDetails.scale,
-    true,
-    "Melody"
+    progressionDetails.scale
   );
   const bassDrumTrack = generateBassDrumTrack(songSynths.bassDrum);
   const snareDrumTrack = generateSnareDrumTrack(songSynths.snareDrum);
@@ -370,11 +394,9 @@ export const createSongTracks = async (
   const guitarRhythmTrack = await generateGuitarRhythmTrack(
     progressionDetails.progression
   );
-  const vocalTrack = generateMelodyTrack(
+  const vocalTrack = generateVocalTrack(
     songSynths.vocal,
-    progressionDetails.scale,
-    false,
-    "Vocal"
+    progressionDetails.scale
   );
   return {
     rhythmTrack: rhythmTrack,
