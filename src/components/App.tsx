@@ -45,7 +45,7 @@ function App() {
   const [loops, setLoops] = useState<Array<Tone.Loop>>([]);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
   const [songTitle, setSongTitle] = useState<string>("");
-  const [lyrics, setLyrics] = useState<Array<string>>();
+  const [lyrics, setLyrics] = useState<Array<string>>([]);
 
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
 
