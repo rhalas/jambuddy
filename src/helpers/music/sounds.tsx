@@ -24,7 +24,9 @@ export const makeTrackLoop = (
   synth: TrackSynth,
   beats: Array<Beat>,
   midiOut: Output | undefined,
-  channelIdx: number
+  channelIdx: number,
+  trackName: string,
+  setCurrentWord: (s: any) => void
 ): Tone.Loop => {
   const notes = makeTrackMidiNotes(beats);
   const loop = new Tone.Loop(() => {
@@ -57,6 +59,12 @@ export const makeTrackLoop = (
             channel.playNote(beat.beatData, {
               duration: noteDurationToMs(notes[index].duration[0]),
             });
+          }, beat.triggerTime);
+        }
+
+        if (trackName === "Vocal") {
+          Tone.Transport.schedule(() => {
+            setCurrentWord((s: number) => s + 1);
           }, beat.triggerTime);
         }
       }

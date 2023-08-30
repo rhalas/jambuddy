@@ -1,6 +1,6 @@
 import { Button, Text, TextField, Separator } from "@radix-ui/themes";
 import { useState, useCallback } from "react";
-import { GetSong } from "../helpers/api/api";
+import { GetSong, LyricLine } from "../helpers/api/api";
 import ScaleLoader from "react-spinners/ScaleLoader";
 
 import styled from "styled-components";
@@ -12,7 +12,7 @@ const SongPromptContainer = styled.div`
 type SongPromptProps = {
   promptDoneCallback: () => void;
   setSongTitle: (s: string) => void;
-  setLyrics: (s: Array<string>) => void;
+  setLyrics: (s: Array<LyricLine>) => void;
 };
 
 export const SongPrompt = (songPromptProps: SongPromptProps) => {

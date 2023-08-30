@@ -26,6 +26,7 @@ type SongPlayerProps = {
   songSynths?: SongSynths;
   generateNewProgression: (synths: SongSynths) => void;
   lyrics: Array<string>;
+  currentWord: number;
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
@@ -37,6 +38,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     generateNewProgression,
     songSynths,
     lyrics,
+    currentWord,
   } = songPlayerProps;
 
   return (
@@ -55,7 +57,11 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
         />
       </SongDetailsContainer>
       <LyricsContainer>
-        <Lyrics lyrics={lyrics} songTitle={songTitle} />
+        <Lyrics
+          lyrics={lyrics}
+          songTitle={songTitle}
+          currentWord={currentWord}
+        />
       </LyricsContainer>
     </SongPlayerContainer>
   );

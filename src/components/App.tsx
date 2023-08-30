@@ -50,6 +50,7 @@ function App() {
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
 
   const [webMidiOutput, setWebMidiOut] = useState<Output | undefined>();
+  const [currentWord, setCurrentWord] = useState<number>(0);
 
   const prepareNextLoop = useCallback(
     (newTracks: Array<TrackData>) => {
@@ -57,7 +58,14 @@ function App() {
       newTracks.forEach((track, index) => {
         if (track.synth) {
           newLoops.push(
-            makeTrackLoop(track.synth, track.beats, webMidiOutput, index + 1)
+            makeTrackLoop(
+              track.synth,
+              track.beats,
+              webMidiOutput,
+              index + 1,
+              track.name,
+              setCurrentWord
+            )
           );
         }
       });
@@ -203,6 +211,7 @@ function App() {
           songSynths={songSynths}
           generateNewProgression={generateNewProgression}
           lyrics={lyrics}
+          currentWord={currentWord}
         />
       )}
     </div>
