@@ -8,6 +8,6 @@ type SequencerProps = {
 export const Sequencer = (sequencerProps: SequencerProps) => {
   const { tracks } = sequencerProps;
   return tracks.map((track) => {
-    return <Track trackData={track} />;
+    return <Track key={track.name} trackData={track} />;
   });
 };

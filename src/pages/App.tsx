@@ -61,7 +61,7 @@ function App() {
   );
 
   useEffect(() => {
-    if (beatNumber % 16 == 0 && lyrics.length !== 0) {
+    if (beatNumber % 16 == 0) {
       if (!ranCheckThisBar) {
         let nextLyricIndex = currentLyricIndex + 1;
         if (nextLyricIndex === lyrics.length) {

@@ -68,7 +68,7 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
         ref={sliderRef}
       >
         {progressions.map((p, i) => (
-          <SwiperSlideContainer>
+          <SwiperSlideContainer key={i}>
             <ProgressionContainer isActive={i === playingIndex}>
               <KeyInfoContainer>
                 <Text>

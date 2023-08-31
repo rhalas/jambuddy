@@ -60,19 +60,18 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              {midiOutputs.map((outputDevice) => {
+              {midiOutputs.map((outputDevice, index) => {
                 return (
-                  <>
-                    <DropdownMenu.CheckboxItem
-                      className="DropdownMenuCheckboxItem"
-                      checked={true}
-                    >
-                      <DropdownMenu.ItemIndicator className="DropdownMenuItemIndicator">
-                        <CheckIcon />
-                      </DropdownMenu.ItemIndicator>
-                      {outputDevice.name}
-                    </DropdownMenu.CheckboxItem>
-                  </>
+                  <DropdownMenu.CheckboxItem
+                    className="DropdownMenuCheckboxItem"
+                    checked={index == 0}
+                    key={index}
+                  >
+                    <DropdownMenu.ItemIndicator className="DropdownMenuItemIndicator">
+                      <CheckIcon />
+                    </DropdownMenu.ItemIndicator>
+                    {outputDevice.name}
+                  </DropdownMenu.CheckboxItem>
                 );
               })}
             </DropdownMenu.Content>
