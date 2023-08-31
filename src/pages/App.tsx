@@ -42,21 +42,14 @@ function App() {
 
   const prepareNextLoop = useCallback(
     (newTracks: Array<TrackData>) => {
-      const newLoops: Array<Tone.Loop> = [];
-      newTracks.forEach((track, index) => {
-        if (track.synth) {
-          newLoops.push(
-            makeTrackLoop(
-              track.synth,
-              track.beats,
-              midiOutputs[0],
-              index + 1,
-              track.name,
-              setCurrentWord,
-              lyrics
-            )
-          );
-        }
+      const newLoops: Array<Tone.Loop> = newTracks.map((track, index) => {
+        return makeTrackLoop(
+          track,
+          midiOutputs[0],
+          index + 1,
+          setCurrentWord,
+          lyrics
+        );
       });
 
       insturmentLoops.forEach((insturmentLoop) => {
@@ -150,7 +143,7 @@ function App() {
           tempo={tempo}
           songTitle={songTitle}
           songSynths={songSynths}
-          generateNewProgression={makeNewSong}
+          makeNewSong={makeNewSong}
           lyrics={lyrics}
           currentWord={currentWord}
           midiOutputs={midiOutputs}

@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { Beat, TrackSynth } from "../types/types";
+import { Beat, TrackData } from "../types/types";
 import { NUMBER_OF_BARS } from "../types/music_types";
 import { makeTrackMidiNotes } from "./midi";
 import { Output } from "webmidi";
@@ -24,27 +24,25 @@ const triggerSample = (player: Tone.Player, beat: Beat) => {
 };
 
 export const makeTrackLoop = (
-  synth: TrackSynth,
-  beats: Array<Beat>,
+  track: TrackData,
   midiOut: Output | undefined,
   channelIdx: number,
-  trackName: string,
   setCurrentWord: Dispatch<SetStateAction<number>>,
   lyrics: Array<LyricLine>
 ): Tone.Loop => {
-  const notes = makeTrackMidiNotes(beats);
+  const notes = makeTrackMidiNotes(track.beats);
   const loop = new Tone.Loop(() => {
-    beats.forEach((beat, index) => {
+    track.beats.forEach((beat, index) => {
       if (beat.length) {
-        if (synth.polySynth) {
-          triggerPolySynthSample(synth.polySynth, beat);
-        } else if (synth.membraneSynth) {
-          triggerMembraneSynthSample(synth.membraneSynth, beat);
-        } else if (synth.noiseSynth) {
-          triggerNoiseSynthSample(synth.noiseSynth, beat);
-        } else if (synth.samplePlayers) {
+        if (track.synth.polySynth) {
+          triggerPolySynthSample(track.synth.polySynth, beat);
+        } else if (track.synth.membraneSynth) {
+          triggerMembraneSynthSample(track.synth.membraneSynth, beat);
+        } else if (track.synth.noiseSynth) {
+          triggerNoiseSynthSample(track.synth.noiseSynth, beat);
+        } else if (track.synth.samplePlayers) {
           if (beat.label) {
-            triggerSample(synth.samplePlayers[beat.label], beat);
+            triggerSample(track.synth.samplePlayers[beat.label], beat);
           }
         }
 
@@ -56,7 +54,7 @@ export const makeTrackLoop = (
           channelIdx
         );
 
-        if (trackName === "Vocals") {
+        if (track.name === "Vocals") {
           scheduleVocalsCallback(lyrics, beat.triggerTime, setCurrentWord);
         }
       }
