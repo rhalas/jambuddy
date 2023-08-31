@@ -297,6 +297,7 @@ export const createSongTracks = async (
     songSynths.vocal,
     progressionDetails.scale
   );
+
   return {
     rhythmTrack: rhythmTrack,
     melodyTrack: melodyTrack,

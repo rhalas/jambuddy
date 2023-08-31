@@ -9,9 +9,25 @@ import {
   MAX_TEMPO,
   MIN_TEMPO,
 } from "../types/music_types";
+import { Dispatch, SetStateAction } from "react";
+import * as Tone from "tone";
 
-export const getNewTempo = () => {
-  return Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
+export const prepareTempo = (
+  currentTempo: number,
+  setTempo: Dispatch<SetStateAction<number>>
+) => {
+  let tempoToUse = currentTempo;
+  if (tempoToUse === -1) {
+    tempoToUse =
+      Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
+  }
+
+  if (Tone.Transport.state === "stopped") {
+    Tone.Transport.bpm.value = tempoToUse;
+    Tone.Transport.start();
+  }
+
+  setTempo(tempoToUse);
 };
 
 export const generateNewProgression = (): ProgressionDetails => {

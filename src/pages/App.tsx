@@ -1,23 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import * as Tone from "tone";
-import {
-  makeSnareDrum,
-  makeBassDrum,
-  makeLeadSynth,
-  makeRhythmSynth,
-  makeBassSynth,
-  makeClosedHiHat,
-  makeOpenHiHat,
-  makeVocalSynth,
-} from "../helpers/music/synths";
+import { makeNewSongSynths } from "../helpers/music/synths";
 import {
   TrackData,
   ProgressionDetails,
   SongSynths,
 } from "../helpers/types/types";
 import { makeTrackLoop } from "../helpers/music/sounds";
-import { generateNewProgression, getNewTempo } from "../helpers/music/music";
+import { generateNewProgression, prepareTempo } from "../helpers/music/music";
 import { createSongTracks } from "../helpers/music/tracks";
 import { SongPrompt } from "../components/SongPrompt";
 import { SongPlayer } from "../components/SongPlayer";
@@ -120,56 +111,24 @@ function App() {
 
       const newSongInfo = await createSongTracks(newProgressionDetail, synths);
 
-      const newTracks = [
-        newSongInfo.rhythmTrack,
-        newSongInfo.melodyTrack,
-        newSongInfo.bassTrack,
-        newSongInfo.guitarRhythmTrack,
-        newSongInfo.bassDrumTrack,
-        newSongInfo.snareDrumTrack,
-        newSongInfo.openHiHatTrack,
-        newSongInfo.closedHiHatTrack,
-        newSongInfo.vocalTrack,
-      ];
+      newProgressionDetail.tracks = Object.values(newSongInfo);
 
-      newProgressionDetail.tracks = newTracks;
-
-      let tempoToUse = tempo;
-      if (tempoToUse === -1) {
-        tempoToUse = getNewTempo();
-      }
+      prepareTempo(tempo, setTempo);
 
       if (!loopOnDeck) {
-        prepareNextLoop(newTracks);
+        prepareNextLoop(newProgressionDetail.tracks);
         setLoopOnDeck(true);
       }
 
-      if (Tone.Transport.state === "stopped") {
-        Tone.Transport.bpm.value = tempoToUse;
-        Tone.Transport.start();
-      }
-
       setCreatedProgressions((s) => [...s, newProgressionDetail]);
-      setTempo(tempoToUse);
     },
     [loopOnDeck, prepareNextLoop, tempo]
   );
 
   useEffect(() => {
     if (promptDone) {
-      const newSongSynths: SongSynths = {
-        rhythm: makeRhythmSynth(),
-        lead: makeLeadSynth(),
-        vocal: makeVocalSynth(),
-        snareDrum: makeSnareDrum(),
-        bassDrum: makeBassDrum(),
-        bass: makeBassSynth(),
-        closedHiHat: makeClosedHiHat(),
-        openHiHat: makeOpenHiHat(),
-      };
-
+      const newSongSynths = makeNewSongSynths();
       scheduleBeatIncrement(setBeatNumber);
-
       setSongSynths(newSongSynths);
       makeNewSong(newSongSynths);
       setPromptDone(false);

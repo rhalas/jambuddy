@@ -1,5 +1,18 @@
 import * as Tone from "tone";
-import { TrackSynth } from "../types/types";
+import { SongSynths, TrackSynth } from "../types/types";
+
+export const makeNewSongSynths = (): SongSynths => {
+  return {
+    rhythm: makeRhythmSynth(),
+    lead: makeLeadSynth(),
+    vocal: makeVocalSynth(),
+    snareDrum: makeSnareDrum(),
+    bassDrum: makeBassDrum(),
+    bass: makeBassSynth(),
+    closedHiHat: makeClosedHiHat(),
+    openHiHat: makeOpenHiHat(),
+  };
+};
 
 export const makeSnareDrum = (): TrackSynth => {
   const meter = new Tone.Meter();
