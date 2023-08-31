@@ -33,6 +33,7 @@ import { SongPrompt } from "../components/SongPrompt";
 import { SongPlayer } from "../components/SongPlayer";
 import { LyricLine } from "../helpers/api/api";
 import { useMIDI } from "../hooks/useMidi";
+import { scheduleBeatIncrement } from "../helpers/music/schedule";
 
 function App() {
   const { midiOutputs } = useMIDI();
@@ -202,9 +203,7 @@ function App() {
         openHiHat: makeOpenHiHat(),
       };
 
-      Tone.Transport.scheduleRepeat(() => {
-        setBeatNumber((beatNumber) => beatNumber + 1);
-      }, `4n`);
+      scheduleBeatIncrement(setBeatNumber);
 
       setSongSynths(newSongSynths);
       generateNewProgression(newSongSynths);
