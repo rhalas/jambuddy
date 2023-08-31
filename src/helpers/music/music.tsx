@@ -19,7 +19,6 @@ import {
 } from "../types/music_types";
 import { makeNewTrack, addNewBeatToTrack } from "../utils/track_utils";
 import * as Tone from "tone";
-import { LyricLine } from "../api/api";
 
 export const generatedRandomProgression = (
   chordDetails: Array<ChordInfo>

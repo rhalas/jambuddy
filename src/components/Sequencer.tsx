@@ -1,5 +1,5 @@
 import { TrackData } from "../helpers/types/types";
-import { Track } from "./track";
+import { Track } from "./Track";
 
 type SequencerProps = {
   tracks: Array<TrackData>;

@@ -28,8 +28,7 @@ export const makeTrackLoop = (
   channelIdx: number,
   trackName: string,
   setCurrentWord: (s: any) => void,
-  lyrics: Array<LyricLine>,
-  currentWord: number
+  lyrics: Array<LyricLine>
 ): Tone.Loop => {
   const notes = makeTrackMidiNotes(beats);
   const loop = new Tone.Loop(() => {

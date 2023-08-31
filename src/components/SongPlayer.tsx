@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { SongInfo } from "./songInfo";
-import { Sequencer } from "./sequencer";
+import { SongInfo } from "./SongInfo";
+import { Sequencer } from "./Sequencer";
 import { ProgressionDetails, SongSynths } from "../helpers/types/types";
 import { Lyrics } from "./Lyrics";
 import { LyricLine } from "../helpers/api/api";

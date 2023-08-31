@@ -2,7 +2,7 @@ import { ProgressionDetails } from "../helpers/types/types";
 import styled from "styled-components";
 import { exportToMidi } from "../helpers/music/midi";
 import { Button, Text, Flex } from "@radix-ui/themes";
-import { ProgressionInfo } from "./progressionInfo";
+import { ProgressionInfo } from "./ProgressionInfo";
 import { WebMidi, Output } from "webmidi";
 const SongInfoContainer = styled.div``;
 import { useEffect, useState } from "react";

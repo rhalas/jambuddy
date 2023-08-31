@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { TrackData } from "../helpers/types/types";
-import { Visualizer } from "./visualizer";
+import { Visualizer } from "./Visualizer";
 
 type TrackProps = {
   trackData: TrackData;

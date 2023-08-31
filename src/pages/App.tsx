@@ -70,8 +70,7 @@ function App() {
               index + 1,
               track.name,
               setCurrentWord,
-              lyrics,
-              currentWord
+              lyrics
             )
           );
         }
@@ -82,7 +81,7 @@ function App() {
       });
       setInstrumentLoops(newLoops);
     },
-    [lyrics, insturmentLoops, webMidiOutput, currentWord]
+    [lyrics, insturmentLoops, webMidiOutput]
   );
 
   useEffect(() => {
