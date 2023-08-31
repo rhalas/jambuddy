@@ -43,15 +43,19 @@ function App() {
     useState<number>(0);
   const [ranCheckThisBar, setRanCheckThisBar] = useState<boolean>(false);
   const [tempo, setTempo] = useState<number>(-1);
-  const [loops, setLoops] = useState<Array<Tone.Loop>>([]);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
   const [songTitle, setSongTitle] = useState<string>("");
+
   const [lyrics, setLyrics] = useState<Array<LyricLine>>([]);
+  const [currentLyricIndex, setCurrentLyricIndex] = useState<number>(0);
 
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
 
   const [webMidiOutput, setWebMidiOut] = useState<Output | undefined>();
   const [currentWord, setCurrentWord] = useState<number>(0);
+  const [promptDone, setPromptDone] = useState<boolean>(false);
+
+  const [insturmentLoops, setInstrumentLoops] = useState<Array<Tone.Loop>>([]);
 
   const prepareNextLoop = useCallback(
     (newTracks: Array<TrackData>) => {
@@ -65,30 +69,41 @@ function App() {
               webMidiOutput,
               index + 1,
               track.name,
-              setCurrentWord
+              setCurrentWord,
+              lyrics,
+              currentWord
             )
           );
         }
       });
 
-      loops.forEach((loop) => {
-        loop.stop();
+      insturmentLoops.forEach((insturmentLoop) => {
+        insturmentLoop.stop();
       });
-      setLoops(newLoops);
+      setInstrumentLoops(newLoops);
     },
-    [loops, webMidiOutput]
+    [lyrics, insturmentLoops, webMidiOutput, currentWord]
   );
 
   useEffect(() => {
-    if (beatNumber % 16 == 0) {
-      if (
-        !ranCheckThisBar &&
-        playingProgressionIndex < createdProgressions.length - 1
-      ) {
-        prepareNextLoop(
-          createdProgressions[playingProgressionIndex + 1].tracks
-        );
-        setPlayingProgressionIndex((s) => s + 1);
+    if (beatNumber % 16 == 0 && lyrics.length !== 0) {
+      if (!ranCheckThisBar) {
+        let nextLyricIndex = currentLyricIndex + 1;
+        if (nextLyricIndex === lyrics.length) {
+          nextLyricIndex = 0;
+        }
+
+        if (playingProgressionIndex < createdProgressions.length - 1) {
+          nextLyricIndex = 0;
+          setCurrentWord(0);
+          console.log(lyrics);
+          prepareNextLoop(
+            createdProgressions[playingProgressionIndex + 1].tracks
+          );
+          setPlayingProgressionIndex((s) => s + 1);
+        }
+
+        setCurrentLyricIndex(nextLyricIndex);
         setRanCheckThisBar(true);
       }
     } else {
@@ -96,13 +111,17 @@ function App() {
       setLoopOnDeck(false);
     }
   }, [
+    ranCheckThisBar,
     beatNumber,
     createdProgressions,
     playingProgressionIndex,
-    ranCheckThisBar,
     prepareNextLoop,
     tempo,
     loopOnDeck,
+    currentLyricIndex,
+    lyrics,
+    setCurrentLyricIndex,
+    currentWord,
   ]);
 
   const onEnabled = async () => {
@@ -112,94 +131,104 @@ function App() {
     }
   };
 
-  const initAudio = async () => {
-    WebMidi.enable()
-      .then(onEnabled)
-      .catch((err) => alert(err));
+  const generateNewProgression = useCallback(
+    async (synths: SongSynths) => {
+      const newProgressionDetail: ProgressionDetails = {
+        rootNote: "",
+        mode: "",
+        progression: [],
+        scale: [],
+        tracks: [],
+      };
 
-    const newSongSynths: SongSynths = {
-      rhythm: makeRhythmSynth(),
-      lead: makeLeadSynth(),
-      vocal: makeVocalSynth(),
-      snareDrum: makeSnareDrum(),
-      bassDrum: makeBassDrum(),
-      bass: makeBassSynth(),
-      closedHiHat: makeClosedHiHat(),
-      openHiHat: makeOpenHiHat(),
-    };
+      const rootNote = notes[Math.floor(Math.random() * notes.length)];
+      const listOfModes = Object.keys(progressions);
+      const newMode =
+        listOfModes[Math.floor(Math.random() * listOfModes.length)];
 
-    Tone.Transport.scheduleRepeat(() => {
-      setBeatNumber((beatNumber) => beatNumber + 1);
-    }, `4n`);
+      newProgressionDetail.rootNote = rootNote;
+      newProgressionDetail.mode = newMode;
 
-    setSongSynths(newSongSynths);
-    await generateNewProgression(newSongSynths);
-  };
+      const scale = generateScaleNotes(newProgressionDetail);
+      const chordDetails = generateChordDetails(
+        scale,
+        newProgressionDetail.mode
+      );
+      const progression = generatedRandomProgression(chordDetails);
 
-  const generateNewProgression = async (synths: SongSynths) => {
-    const newProgressionDetail: ProgressionDetails = {
-      rootNote: "",
-      mode: "",
-      progression: [],
-      scale: [],
-      tracks: [],
-    };
+      newProgressionDetail.progression = progression;
+      newProgressionDetail.scale = scale;
 
-    const rootNote = notes[Math.floor(Math.random() * notes.length)];
-    const listOfModes = Object.keys(progressions);
-    const newMode = listOfModes[Math.floor(Math.random() * listOfModes.length)];
+      const newSongInfo = await createSongTracks(newProgressionDetail, synths);
 
-    newProgressionDetail.rootNote = rootNote;
-    newProgressionDetail.mode = newMode;
+      const newTracks = [
+        newSongInfo.rhythmTrack,
+        newSongInfo.melodyTrack,
+        newSongInfo.bassTrack,
+        newSongInfo.guitarRhythmTrack,
+        newSongInfo.bassDrumTrack,
+        newSongInfo.snareDrumTrack,
+        newSongInfo.openHiHatTrack,
+        newSongInfo.closedHiHatTrack,
+        newSongInfo.vocalTrack,
+      ];
 
-    const scale = generateScaleNotes(newProgressionDetail);
-    const chordDetails = generateChordDetails(scale, newProgressionDetail.mode);
-    const progression = generatedRandomProgression(chordDetails);
+      newProgressionDetail.tracks = newTracks;
 
-    newProgressionDetail.progression = progression;
-    newProgressionDetail.scale = scale;
+      let tempoToUse = tempo;
+      if (tempoToUse === -1) {
+        tempoToUse =
+          Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
+      }
 
-    const newSongInfo = await createSongTracks(newProgressionDetail, synths);
+      if (!loopOnDeck) {
+        prepareNextLoop(newTracks);
+        setLoopOnDeck(true);
+      }
 
-    const newTracks = [
-      newSongInfo.rhythmTrack,
-      newSongInfo.melodyTrack,
-      newSongInfo.bassTrack,
-      newSongInfo.guitarRhythmTrack,
-      newSongInfo.bassDrumTrack,
-      newSongInfo.snareDrumTrack,
-      newSongInfo.openHiHatTrack,
-      newSongInfo.closedHiHatTrack,
-      newSongInfo.vocalTrack,
-    ];
+      if (Tone.Transport.state === "stopped") {
+        Tone.Transport.bpm.value = tempoToUse;
+        Tone.Transport.start();
+      }
 
-    newProgressionDetail.tracks = newTracks;
+      setCreatedProgressions((s) => [...s, newProgressionDetail]);
+      setTempo(tempoToUse);
+    },
+    [loopOnDeck, prepareNextLoop, tempo]
+  );
 
-    let tempoToUse = tempo;
-    if (tempoToUse === -1) {
-      tempoToUse =
-        Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
+  useEffect(() => {
+    if (promptDone) {
+      WebMidi.enable()
+        .then(onEnabled)
+        .catch((err) => alert(err));
+
+      const newSongSynths: SongSynths = {
+        rhythm: makeRhythmSynth(),
+        lead: makeLeadSynth(),
+        vocal: makeVocalSynth(),
+        snareDrum: makeSnareDrum(),
+        bassDrum: makeBassDrum(),
+        bass: makeBassSynth(),
+        closedHiHat: makeClosedHiHat(),
+        openHiHat: makeOpenHiHat(),
+      };
+
+      Tone.Transport.scheduleRepeat(() => {
+        setBeatNumber((beatNumber) => beatNumber + 1);
+      }, `4n`);
+
+      setSongSynths(newSongSynths);
+      generateNewProgression(newSongSynths);
+      setPromptDone(false);
     }
-
-    if (!loopOnDeck) {
-      prepareNextLoop(newTracks);
-      setLoopOnDeck(true);
-    }
-
-    if (Tone.Transport.state === "stopped") {
-      Tone.Transport.bpm.value = tempoToUse;
-      Tone.Transport.start();
-    }
-
-    setCreatedProgressions((s) => [...s, newProgressionDetail]);
-    setTempo(tempoToUse);
-  };
+  }, [promptDone, generateNewProgression]);
 
   return (
     <div>
       {createdProgressions.length === 0 ? (
         <SongPrompt
-          promptDoneCallback={initAudio}
+          setPromptDone={setPromptDone}
           setSongTitle={setSongTitle}
           setLyrics={setLyrics}
         />

@@ -3,6 +3,7 @@ import { Beat, TrackSynth } from "../types/types";
 import { NUMBER_OF_BARS } from "../types/music_types";
 import { makeTrackMidiNotes } from "./midi";
 import { Output } from "webmidi";
+import { LyricLine } from "../api/api";
 
 const noteDurationToMs = (duration: string) => {
   const tempo = Tone.Transport.bpm.value;
@@ -26,7 +27,9 @@ export const makeTrackLoop = (
   midiOut: Output | undefined,
   channelIdx: number,
   trackName: string,
-  setCurrentWord: (s: any) => void
+  setCurrentWord: (s: any) => void,
+  lyrics: Array<LyricLine>,
+  currentWord: number
 ): Tone.Loop => {
   const notes = makeTrackMidiNotes(beats);
   const loop = new Tone.Loop(() => {
@@ -62,9 +65,13 @@ export const makeTrackLoop = (
           }, beat.triggerTime);
         }
 
-        if (trackName === "Vocal") {
+        if (trackName === "Vocals") {
           Tone.Transport.schedule(() => {
-            setCurrentWord((s: number) => s + 1);
+            if (lyrics.length > 0) {
+              setCurrentWord((s: number) =>
+                s >= lyrics[lyrics.length - 1].endWord ? 0 : s + 1
+              );
+            }
           }, beat.triggerTime);
         }
       }

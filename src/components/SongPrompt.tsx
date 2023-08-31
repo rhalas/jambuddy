@@ -10,13 +10,13 @@ const SongPromptContainer = styled.div`
 `;
 
 type SongPromptProps = {
-  promptDoneCallback: () => void;
+  setPromptDone: (s: boolean) => void;
   setSongTitle: (s: string) => void;
   setLyrics: (s: Array<LyricLine>) => void;
 };
 
 export const SongPrompt = (songPromptProps: SongPromptProps) => {
-  const { promptDoneCallback, setSongTitle, setLyrics } = songPromptProps;
+  const { setPromptDone, setSongTitle, setLyrics } = songPromptProps;
 
   const [songIdea, setSongIdea] = useState("");
   const [waitingOnApi, setWaitingOnApi] = useState(false);
@@ -27,12 +27,14 @@ export const SongPrompt = (songPromptProps: SongPromptProps) => {
         setWaitingOnApi(true);
         const res = await GetSong(songIdea);
         setSongTitle(res.title);
+        console.log("lyrics");
         setLyrics(res.lyrics);
+        console.log(res.lyrics);
       }
-      promptDoneCallback();
       setWaitingOnApi(false);
+      setPromptDone(true);
     },
-    [promptDoneCallback, setSongTitle, setLyrics]
+    [setPromptDone, setSongTitle, setLyrics]
   );
 
   return waitingOnApi ? (
