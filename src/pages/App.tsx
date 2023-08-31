@@ -29,12 +29,14 @@ import {
   generatedRandomProgression,
   generateChordDetails,
 } from "../helpers/music/music";
-import { WebMidi, Output } from "webmidi";
 import { SongPrompt } from "../components/SongPrompt";
 import { SongPlayer } from "../components/SongPlayer";
 import { LyricLine } from "../helpers/api/api";
+import { useMIDI } from "../hooks/useMidi";
 
 function App() {
+  const { midiOutputs } = useMIDI();
+
   const [songSynths, setSongSynths] = useState<SongSynths>();
   const [createdProgressions, setCreatedProgressions] = useState<
     Array<ProgressionDetails>
@@ -51,7 +53,6 @@ function App() {
 
   const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
 
-  const [webMidiOutput, setWebMidiOut] = useState<Output | undefined>();
   const [currentWord, setCurrentWord] = useState<number>(0);
   const [promptDone, setPromptDone] = useState<boolean>(false);
 
@@ -66,7 +67,7 @@ function App() {
             makeTrackLoop(
               track.synth,
               track.beats,
-              webMidiOutput,
+              midiOutputs[0],
               index + 1,
               track.name,
               setCurrentWord,
@@ -81,7 +82,7 @@ function App() {
       });
       setInstrumentLoops(newLoops);
     },
-    [lyrics, insturmentLoops, webMidiOutput]
+    [lyrics, insturmentLoops, midiOutputs]
   );
 
   useEffect(() => {
@@ -95,7 +96,6 @@ function App() {
         if (playingProgressionIndex < createdProgressions.length - 1) {
           nextLyricIndex = 0;
           setCurrentWord(0);
-          console.log(lyrics);
           prepareNextLoop(
             createdProgressions[playingProgressionIndex + 1].tracks
           );
@@ -122,13 +122,6 @@ function App() {
     setCurrentLyricIndex,
     currentWord,
   ]);
-
-  const onEnabled = async () => {
-    if (WebMidi.outputs.length >= 1) {
-      const output = WebMidi.outputs[1];
-      setWebMidiOut(output);
-    }
-  };
 
   const generateNewProgression = useCallback(
     async (synths: SongSynths) => {
@@ -198,10 +191,6 @@ function App() {
 
   useEffect(() => {
     if (promptDone) {
-      WebMidi.enable()
-        .then(onEnabled)
-        .catch((err) => alert(err));
-
       const newSongSynths: SongSynths = {
         rhythm: makeRhythmSynth(),
         lead: makeLeadSynth(),
@@ -241,6 +230,7 @@ function App() {
           generateNewProgression={generateNewProgression}
           lyrics={lyrics}
           currentWord={currentWord}
+          midiOutputs={midiOutputs}
         />
       )}
     </div>

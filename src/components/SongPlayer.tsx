@@ -4,6 +4,7 @@ import { Sequencer } from "./Sequencer";
 import { ProgressionDetails, SongSynths } from "../helpers/types/types";
 import { Lyrics } from "./Lyrics";
 import { LyricLine } from "../helpers/api/api";
+import { Output } from "webmidi";
 
 const SongPlayerContainer = styled.div`
   display: flex;
@@ -28,6 +29,7 @@ type SongPlayerProps = {
   generateNewProgression: (synths: SongSynths) => void;
   lyrics: Array<LyricLine>;
   currentWord: number;
+  midiOutputs: Array<Output>;
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
@@ -40,6 +42,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     songSynths,
     lyrics,
     currentWord,
+    midiOutputs,
   } = songPlayerProps;
 
   return (
@@ -52,6 +55,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
           addNewChordCallback={() => {
             generateNewProgression(songSynths!);
           }}
+          midiOutputs={midiOutputs}
         />
         <Sequencer
           tracks={createdProgressions[playingProgressionIndex].tracks}

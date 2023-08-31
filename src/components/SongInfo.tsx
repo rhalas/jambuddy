@@ -3,35 +3,28 @@ import styled from "styled-components";
 import { exportToMidi } from "../helpers/music/midi";
 import { Button, Text, Flex } from "@radix-ui/themes";
 import { ProgressionInfo } from "./ProgressionInfo";
-import { WebMidi, Output } from "webmidi";
-const SongInfoContainer = styled.div``;
-import { useEffect, useState } from "react";
 import { CaretDownIcon, CheckIcon } from "@radix-ui/react-icons";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Output } from "webmidi";
+
+const SongInfoContainer = styled.div``;
 
 type SongInfoProps = {
   progressions: Array<ProgressionDetails>;
   playingIndex: number;
   tempo: number;
   addNewChordCallback: () => void;
+  midiOutputs: Array<Output>;
 };
 
 export const SongInfo = (songInfoProps: SongInfoProps) => {
-  const { progressions, playingIndex, tempo, addNewChordCallback } =
-    songInfoProps;
-  const [outputDevices, setOutputDevices] = useState<Array<Output>>([]);
-
-  useEffect(() => {
-    WebMidi.enable()
-      .then(() => {
-        const outputs: Array<Output> = [];
-        WebMidi.outputs.forEach((output) => {
-          outputs.push(output);
-        });
-        setOutputDevices(outputs);
-      })
-      .catch((err) => alert(err));
-  }, []);
+  const {
+    progressions,
+    playingIndex,
+    tempo,
+    addNewChordCallback,
+    midiOutputs,
+  } = songInfoProps;
 
   return (
     progressions && (
@@ -67,7 +60,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              {outputDevices.map((outputDevice) => {
+              {midiOutputs.map((outputDevice) => {
                 return (
                   <>
                     <DropdownMenu.CheckboxItem

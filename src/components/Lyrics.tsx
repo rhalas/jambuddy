@@ -1,7 +1,6 @@
 import { Text } from "@radix-ui/themes";
 import styled from "styled-components";
 import { LyricLine } from "../helpers/api/api";
-import { useEffect } from "react";
 
 const LyricLineComponent = styled.div`
   margin-bottom: 30px;
@@ -19,10 +18,6 @@ type LyricsProps = {
 
 export const Lyrics = (lyricsProps: LyricsProps) => {
   const { lyrics, songTitle, currentWord } = lyricsProps;
-
-  useEffect(() => {
-    console.log(currentWord);
-  }, [currentWord]);
 
   return (
     <>

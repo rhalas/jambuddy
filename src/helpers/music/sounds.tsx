@@ -58,9 +58,11 @@ export const makeTrackLoop = (
         if (midiOut) {
           const channel = midiOut!.channels[channelIdx];
           Tone.Transport.schedule(() => {
-            channel.playNote(beat.beatData, {
-              duration: noteDurationToMs(notes[index].duration[0]),
-            });
+            if (beat.beatData) {
+              channel.playNote(beat.beatData, {
+                duration: noteDurationToMs(notes[index].duration[0]),
+              });
+            }
           }, beat.triggerTime);
         }
 
