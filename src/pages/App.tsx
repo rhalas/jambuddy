@@ -16,19 +16,9 @@ import {
   ProgressionDetails,
   SongSynths,
 } from "../helpers/types/types";
-import {
-  MAX_TEMPO,
-  MIN_TEMPO,
-  notes,
-  progressions,
-} from "../helpers/types/music_types";
 import { makeTrackLoop } from "../helpers/music/sounds";
-import {
-  createSongTracks,
-  generateScaleNotes,
-  generatedRandomProgression,
-  generateChordDetails,
-} from "../helpers/music/music";
+import { generateNewProgression, getNewTempo } from "../helpers/music/music";
+import { createSongTracks } from "../helpers/music/tracks";
 import { SongPrompt } from "../components/SongPrompt";
 import { SongPlayer } from "../components/SongPlayer";
 import { LyricLine } from "../helpers/api/api";
@@ -124,33 +114,9 @@ function App() {
     currentWord,
   ]);
 
-  const generateNewProgression = useCallback(
+  const makeNewSong = useCallback(
     async (synths: SongSynths) => {
-      const newProgressionDetail: ProgressionDetails = {
-        rootNote: "",
-        mode: "",
-        progression: [],
-        scale: [],
-        tracks: [],
-      };
-
-      const rootNote = notes[Math.floor(Math.random() * notes.length)];
-      const listOfModes = Object.keys(progressions);
-      const newMode =
-        listOfModes[Math.floor(Math.random() * listOfModes.length)];
-
-      newProgressionDetail.rootNote = rootNote;
-      newProgressionDetail.mode = newMode;
-
-      const scale = generateScaleNotes(newProgressionDetail);
-      const chordDetails = generateChordDetails(
-        scale,
-        newProgressionDetail.mode
-      );
-      const progression = generatedRandomProgression(chordDetails);
-
-      newProgressionDetail.progression = progression;
-      newProgressionDetail.scale = scale;
+      const newProgressionDetail = generateNewProgression();
 
       const newSongInfo = await createSongTracks(newProgressionDetail, synths);
 
@@ -170,8 +136,7 @@ function App() {
 
       let tempoToUse = tempo;
       if (tempoToUse === -1) {
-        tempoToUse =
-          Math.floor(Math.random() * (MAX_TEMPO - MIN_TEMPO + 1)) + MIN_TEMPO;
+        tempoToUse = getNewTempo();
       }
 
       if (!loopOnDeck) {
@@ -206,10 +171,10 @@ function App() {
       scheduleBeatIncrement(setBeatNumber);
 
       setSongSynths(newSongSynths);
-      generateNewProgression(newSongSynths);
+      makeNewSong(newSongSynths);
       setPromptDone(false);
     }
-  }, [promptDone, generateNewProgression]);
+  }, [promptDone, makeNewSong]);
 
   return (
     <div>
@@ -226,7 +191,7 @@ function App() {
           tempo={tempo}
           songTitle={songTitle}
           songSynths={songSynths}
-          generateNewProgression={generateNewProgression}
+          generateNewProgression={makeNewSong}
           lyrics={lyrics}
           currentWord={currentWord}
           midiOutputs={midiOutputs}
