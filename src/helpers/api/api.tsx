@@ -1,5 +1,5 @@
 const DEV_BASE_URL = "http://127.0.0.1:5000";
-const PROD_BASE_URL = "https://nanana-x52p.vercel.app/";
+const PROD_BASE_URL = "https://nanana-muqy.vercel.app/";
 const GET_SONG_PATH = "/get_song";
 
 type LyricWord = {
