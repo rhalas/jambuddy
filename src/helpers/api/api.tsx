@@ -1,4 +1,5 @@
 const DEV_BASE_URL = "http://127.0.0.1:5000";
+const PROD_BASE_URL = "https://nanana-x52p.vercel.app/";
 const GET_SONG_PATH = "/get_song";
 
 type LyricWord = {
@@ -17,10 +18,18 @@ type GetSongResponse = {
   lyrics: Array<LyricLine>;
 };
 
+const GetBaseUrl = () => {
+  if (import.meta.env.DEV) {
+    return DEV_BASE_URL;
+  } else {
+    return PROD_BASE_URL;
+  }
+};
+
 export const GetSong = async (songTheme: string): Promise<GetSongResponse> => {
   const res: GetSongResponse = { title: "", lyrics: [] };
   try {
-    const response = await fetch(`${DEV_BASE_URL}${GET_SONG_PATH}`, {
+    const response = await fetch(`${GetBaseUrl()}${GET_SONG_PATH}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

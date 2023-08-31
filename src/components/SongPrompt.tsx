@@ -23,14 +23,12 @@ export const SongPrompt = (songPromptProps: SongPromptProps) => {
 
   const doGetSong = useCallback(
     async (songIdea: string) => {
-      if (import.meta.env.DEV) {
-        setWaitingOnApi(true);
-        const res = await GetSong(songIdea);
-        setSongTitle(res.title);
-        console.log("lyrics");
-        setLyrics(res.lyrics);
-        console.log(res.lyrics);
-      }
+      setWaitingOnApi(true);
+
+      const res = await GetSong(songIdea);
+      setSongTitle(res.title);
+      setLyrics(res.lyrics);
+
       setWaitingOnApi(false);
       setPromptDone(true);
     },
