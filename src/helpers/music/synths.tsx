@@ -68,11 +68,20 @@ export const makeLeadSynth = (): TrackSynth => {
     .fan(meter, fft)
     .toDestination();
 
+  const chorus = new Tone.Chorus({
+    frequency: 1.5,
+    delayTime: 3.5,
+    depth: 0.7,
+    type: "sine",
+    spread: 180,
+  }).toDestination();
+
   const reverb = new Tone.Reverb({
     decay: 10.0,
     preDelay: 0.01,
   }).toDestination();
-  newLeadSynth.connect(reverb);
+
+  newLeadSynth.connect(chorus).connect(reverb);
 
   return { polySynth: newLeadSynth, meter: meter, fft: fft };
 };
@@ -82,7 +91,7 @@ export const makeVocalSynth = (): TrackSynth => {
   const fft = new Tone.FFT(64);
 
   const newVocalSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -12,
+    volume: -6,
     oscillator: {
       type: "square",
     },
@@ -92,7 +101,7 @@ export const makeVocalSynth = (): TrackSynth => {
     .toDestination();
 
   const reverb = new Tone.Reverb({
-    decay: 10.0,
+    decay: 20.0,
     preDelay: 0.01,
   }).toDestination();
   newVocalSynth.connect(reverb);
@@ -108,7 +117,7 @@ export const makeRhythmSynth = (): TrackSynth => {
     .fan(meter, fft)
     .toDestination();
   newRhythmSynth.set({
-    volume: -10,
+    volume: -8,
     oscillator: {
       type: "fatsine9",
     },
@@ -128,7 +137,7 @@ export const makeBassSynth = (): TrackSynth => {
   const fft = new Tone.FFT(64);
 
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -7,
+    volume: -4,
     oscillator: {
       type: "sawtooth",
     },
