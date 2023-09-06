@@ -13,6 +13,7 @@ const SongPlayerContainer = styled.div`
 
 const SongDetailsContainer = styled.div`
   flex: 1;
+  width: 100%;
 `;
 
 const LyricsContainer = styled.div`

@@ -301,12 +301,12 @@ export const createSongTracks = async (
   return {
     rhythmTrack: rhythmTrack,
     melodyTrack: melodyTrack,
-    bassDrumTrack: bassDrumTrack,
+    vocalTrack: vocalTrack,
     bassTrack: bassTrack,
+    bassDrumTrack: bassDrumTrack,
     snareDrumTrack: snareDrumTrack,
     guitarRhythmTrack: guitarRhythmTrack,
     closedHiHatTrack: closedHiHatTrack,
     openHiHatTrack: openHiHatTrack,
-    vocalTrack: vocalTrack,
   };
 };

@@ -8,7 +8,9 @@ type SequencerProps = {
   showNotation: boolean;
 };
 
-const SequencerContainer = styled.div``;
+const SequencerContainer = styled.div`
+  width: 100%;
+`;
 
 export const Sequencer = (sequencerProps: SequencerProps) => {
   const { tracks, showNotation } = sequencerProps;
