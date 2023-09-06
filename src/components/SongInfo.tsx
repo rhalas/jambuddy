@@ -6,6 +6,7 @@ import { ProgressionInfo } from "./ProgressionInfo";
 import { CaretDownIcon, CheckIcon } from "@radix-ui/react-icons";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Output } from "webmidi";
+import { Dispatch, SetStateAction } from "react";
 
 const SongInfoContainer = styled.div``;
 
@@ -14,6 +15,8 @@ type SongInfoProps = {
   playingIndex: number;
   tempo: number;
   addNewChordCallback: () => void;
+  showNotation: boolean;
+  setShowNotation: Dispatch<SetStateAction<boolean>>;
   midiOutputs: Array<Output>;
 };
 
@@ -24,6 +27,8 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
     tempo,
     addNewChordCallback,
     midiOutputs,
+    showNotation,
+    setShowNotation,
   } = songInfoProps;
 
   return (
@@ -34,6 +39,15 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           playingIndex={playingIndex}
         />
         <Flex justify="center" align="center" gap="9" style={{ height: 40 }}>
+          <Button
+            size="3"
+            variant="classic"
+            onClick={() => {
+              setShowNotation((s) => !s);
+            }}
+          >
+            <Text>{showNotation ? "Show Visualization" : "Show Notation"}</Text>
+          </Button>
           <Button
             size="3"
             variant="classic"

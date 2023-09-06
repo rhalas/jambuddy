@@ -124,7 +124,7 @@ export const generateChordDetails = (
 ): Array<ChordInfo> => {
   const selectedProgression = progressions[progression];
   const chordProgression = [];
-  const defaultNoteOctave = 3;
+  const defaultNoteOctave = 4;
 
   for (let i = 0; i < selectedProgression.length; i++) {
     const chordNotes = [

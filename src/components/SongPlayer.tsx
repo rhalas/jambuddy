@@ -5,6 +5,7 @@ import { ProgressionDetails, SongSynths } from "../helpers/types/types";
 import { Lyrics } from "./Lyrics";
 import { LyricLine } from "../helpers/api/api";
 import { Output } from "webmidi";
+import { useState } from "react";
 
 const SongPlayerContainer = styled.div`
   display: flex;
@@ -33,6 +34,8 @@ type SongPlayerProps = {
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
+  const [showNotation, setShowNotation] = useState(false);
+
   const {
     createdProgressions,
     playingProgressionIndex,
@@ -56,9 +59,12 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
             makeNewSong(songSynths!);
           }}
           midiOutputs={midiOutputs}
+          showNotation={showNotation}
+          setShowNotation={setShowNotation}
         />
         <Sequencer
           tracks={createdProgressions[playingProgressionIndex].tracks}
+          showNotation={showNotation}
         />
       </SongDetailsContainer>
       <LyricsContainer>

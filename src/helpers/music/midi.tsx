@@ -12,7 +12,7 @@ const downloadURI = (uri: string, name: string) => {
   document.body.removeChild(link);
 };
 
-const timeToEights = (time: string): number => {
+export const timeToEights = (time: string): number => {
   const splitTime = time.split(":");
   const barNumber = Number(splitTime[0].substring(1));
   const measureNumber = Number(splitTime[1]);

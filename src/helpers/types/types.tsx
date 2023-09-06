@@ -67,6 +67,10 @@ export interface ToneToEighths {
   [key: string]: number;
 }
 
+export interface BeatLengthToDuration {
+  [key: number]: string;
+}
+
 export type ProgressionDetails = {
   rootNote: string;
   mode: string;
