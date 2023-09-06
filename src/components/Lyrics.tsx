@@ -6,6 +6,11 @@ const LyricLineComponent = styled.div`
   margin-bottom: 30px;
 `;
 
+const LyricsContainer = styled.div`
+  flex: 1;
+  margin: auto;
+  margin-left: 40px;
+`;
 const Word = styled(Text)<{ isActive: boolean }>`
   background: ${(p) => (p.isActive ? "cyan" : "none")};
 `;
@@ -20,7 +25,7 @@ export const Lyrics = (lyricsProps: LyricsProps) => {
   const { lyrics, songTitle, currentWord } = lyricsProps;
 
   return (
-    <>
+    <LyricsContainer>
       <Text size="7">{songTitle}</Text>
       {lyrics.map((lyric) => {
         return (
@@ -35,6 +40,6 @@ export const Lyrics = (lyricsProps: LyricsProps) => {
           </LyricLineComponent>
         );
       })}
-    </>
+    </LyricsContainer>
   );
 };

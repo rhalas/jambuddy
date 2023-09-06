@@ -16,12 +16,6 @@ const SongDetailsContainer = styled.div`
   width: 100%;
 `;
 
-const LyricsContainer = styled.div`
-  flex: 1;
-  margin: auto;
-  margin-left: 40px;
-`;
-
 type SongPlayerProps = {
   createdProgressions: Array<ProgressionDetails>;
   playingProgressionIndex: number;
@@ -68,13 +62,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
           showNotation={showNotation}
         />
       </SongDetailsContainer>
-      <LyricsContainer>
-        <Lyrics
-          lyrics={lyrics}
-          songTitle={songTitle}
-          currentWord={currentWord}
-        />
-      </LyricsContainer>
+      <Lyrics lyrics={lyrics} songTitle={songTitle} currentWord={currentWord} />
     </SongPlayerContainer>
   );
 };

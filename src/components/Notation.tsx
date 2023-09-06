@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { timeToEights } from "../helpers/music/midi";
 import { useRef } from "react";
 import { BeatLengthToDuration, Beat } from "../helpers/types/types";
+import styled from "styled-components";
 
 const STAVE_WIDTH = 1700;
-const STAVE_HEIGHT = 1500;
+const STAVE_HEIGHT = 1250;
 const STAVE_GAP = 150;
 
 type NotationProps = {
@@ -22,6 +23,13 @@ type VexFlowNotes = {
   notes: Array<string>;
   flats: Array<number>;
 };
+
+const NotationContainer = styled.div`
+  display: flex;
+  margin-top: 20px;
+  width: 1060px;
+  height: 500px;
+`;
 
 const beatLengthToDuration: BeatLengthToDuration = {
   4: "w",
@@ -179,5 +187,9 @@ export const Notation = (notationProps: NotationProps) => {
     });
   }, [trackData]);
 
-  return <canvas ref={notationCanvas} />;
+  return (
+    <NotationContainer>
+      <canvas ref={notationCanvas} />
+    </NotationContainer>
+  );
 };
