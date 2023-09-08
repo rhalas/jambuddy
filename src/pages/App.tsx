@@ -45,7 +45,7 @@ function App() {
       const newLoops: Array<Tone.Loop> = newTracks.map((track, index) => {
         return makeTrackLoop(
           track,
-          midiOutputs[0],
+          midiOutputs[1],
           index + 1,
           setCurrentWord,
           lyrics
@@ -75,6 +75,9 @@ function App() {
             createdProgressions[playingProgressionIndex + 1].tracks
           );
           setPlayingProgressionIndex((s) => s + 1);
+          setLoopOnDeck(true);
+        } else {
+          setLoopOnDeck(false);
         }
 
         setCurrentLyricIndex(nextLyricIndex);
@@ -82,7 +85,6 @@ function App() {
       }
     } else {
       setRanCheckThisBar(false);
-      setLoopOnDeck(false);
     }
   }, [
     ranCheckThisBar,
@@ -128,6 +130,20 @@ function App() {
     }
   }, [promptDone, makeNewSong]);
 
+  const deleteProgression = useCallback(
+    (idx: number) => {
+      createdProgressions.splice(idx, 1);
+      if (playingProgressionIndex + 1 < createdProgressions.length) {
+        prepareNextLoop(
+          createdProgressions[playingProgressionIndex + 1].tracks
+        );
+      } else {
+        prepareNextLoop(createdProgressions[playingProgressionIndex].tracks);
+      }
+    },
+    [createdProgressions, prepareNextLoop, playingProgressionIndex]
+  );
+
   return (
     <div>
       {createdProgressions.length === 0 ? (
@@ -147,6 +163,7 @@ function App() {
           lyrics={lyrics}
           currentWord={currentWord}
           midiOutputs={midiOutputs}
+          deleteProgressionCallback={deleteProgression}
         />
       )}
     </div>

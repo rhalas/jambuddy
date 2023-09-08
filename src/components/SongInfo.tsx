@@ -18,6 +18,7 @@ type SongInfoProps = {
   showNotation: boolean;
   setShowNotation: Dispatch<SetStateAction<boolean>>;
   midiOutputs: Array<Output>;
+  deleteProgressionCallback: (idx: number) => void;
 };
 
 export const SongInfo = (songInfoProps: SongInfoProps) => {
@@ -29,6 +30,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
     midiOutputs,
     showNotation,
     setShowNotation,
+    deleteProgressionCallback,
   } = songInfoProps;
 
   return (
@@ -37,11 +39,12 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
         <ProgressionInfo
           progressions={progressions}
           playingIndex={playingIndex}
+          deleteProgressionCallback={deleteProgressionCallback}
         />
         <Flex justify="center" align="center" gap="9" style={{ height: 40 }}>
           <Button
             size="3"
-            variant="classic"
+            variant="solid"
             onClick={() => {
               setShowNotation((s) => !s);
             }}
@@ -50,7 +53,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           </Button>
           <Button
             size="3"
-            variant="classic"
+            variant="solid"
             onClick={() => {
               addNewChordCallback();
             }}
@@ -59,7 +62,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           </Button>
           <Button
             size="3"
-            variant="classic"
+            variant="solid"
             onClick={() => {
               exportToMidi(progressions[playingIndex].tracks, tempo);
             }}
@@ -68,7 +71,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           </Button>
           <DropdownMenu.Root>
             <DropdownMenu.Trigger>
-              <Button size="3" variant="classic">
+              <Button size="3" variant="solid">
                 MIDI Outputs
                 <CaretDownIcon />
               </Button>

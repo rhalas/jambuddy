@@ -9,13 +9,13 @@ export type ChordInfo = {
 export type SongInfo = {
   rhythmTrack: TrackData;
   melodyTrack: TrackData;
-  bassDrumTrack: TrackData;
+  vocalTrack: TrackData;
   bassTrack: TrackData;
-  snareDrumTrack: TrackData;
   guitarRhythmTrack: TrackData;
+  snareDrumTrack: TrackData;
+  bassDrumTrack: TrackData;
   closedHiHatTrack: TrackData;
   openHiHatTrack: TrackData;
-  vocalTrack: TrackData;
 };
 
 export type Beat = {

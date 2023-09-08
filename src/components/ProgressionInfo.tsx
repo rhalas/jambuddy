@@ -3,6 +3,7 @@ import { ProgressionDetails } from "../helpers/types/types";
 import { Text } from "@radix-ui/themes";
 import { ChordInfo } from "../helpers/types/types";
 import { useEffect, useRef } from "react";
+import { Cross2Icon } from "@radix-ui/react-icons";
 
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -11,7 +12,26 @@ const ProgressionInfoContainer = styled.div`
   width: 1000px;
   margin: auto;
 `;
-const KeyInfoContainer = styled.div``;
+
+const KeyInfoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const ProgressionText = styled.div`
+  margin: 0 auto;
+`;
+
+const CancelContainer = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid #333;
+  background-color: transparent;
+`;
+
 const ChordContainer = styled.div`
   margin-bottom: 25px;
 `;
@@ -27,10 +47,12 @@ const SwiperSlideContainer = styled.div``;
 type ProgressionInfoProps = {
   progressions: Array<ProgressionDetails>;
   playingIndex: number;
+  deleteProgressionCallback: (idx: number) => void;
 };
 
 export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
-  const { progressions, playingIndex } = progressionInfoProps;
+  const { progressions, playingIndex, deleteProgressionCallback } =
+    progressionInfoProps;
 
   const sliderRef = useRef<Carousel>(null);
 
@@ -71,9 +93,18 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
           <SwiperSlideContainer key={i}>
             <ProgressionContainer isActive={i === playingIndex}>
               <KeyInfoContainer>
-                <Text>
-                  {p.rootNote} {p.mode}
-                </Text>
+                <ProgressionText>
+                  <Text>
+                    {p.rootNote} {p.mode}
+                  </Text>
+                </ProgressionText>
+                <CancelContainer>
+                  <Cross2Icon
+                    onClick={() => {
+                      deleteProgressionCallback(i);
+                    }}
+                  />
+                </CancelContainer>
               </KeyInfoContainer>
               <ChordContainer>
                 <Text>

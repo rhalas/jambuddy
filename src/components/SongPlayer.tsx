@@ -26,6 +26,7 @@ type SongPlayerProps = {
   lyrics: Array<LyricLine>;
   currentWord: number;
   midiOutputs: Array<Output>;
+  deleteProgressionCallback: (idx: number) => void;
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
@@ -41,6 +42,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     lyrics,
     currentWord,
     midiOutputs,
+    deleteProgressionCallback,
   } = songPlayerProps;
 
   return (
@@ -56,6 +58,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
           midiOutputs={midiOutputs}
           showNotation={showNotation}
           setShowNotation={setShowNotation}
+          deleteProgressionCallback={deleteProgressionCallback}
         />
         <Sequencer
           tracks={createdProgressions[playingProgressionIndex].tracks}

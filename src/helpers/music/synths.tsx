@@ -64,9 +64,12 @@ export const makeLeadSynth = (): TrackSynth => {
       type: "amsawtooth3",
     },
     portamento: 0.005,
-  })
-    .fan(meter, fft)
-    .toDestination();
+  }).fan(meter, fft);
+
+  const reverb = new Tone.Reverb({
+    decay: 10.0,
+    preDelay: 0.01,
+  }).toDestination();
 
   const chorus = new Tone.Chorus({
     frequency: 1.5,
@@ -74,14 +77,9 @@ export const makeLeadSynth = (): TrackSynth => {
     depth: 0.7,
     type: "sine",
     spread: 180,
-  }).toDestination();
+  }).connect(reverb);
 
-  const reverb = new Tone.Reverb({
-    decay: 10.0,
-    preDelay: 0.01,
-  }).toDestination();
-
-  newLeadSynth.connect(chorus).connect(reverb);
+  newLeadSynth.connect(chorus);
 
   return { polySynth: newLeadSynth, meter: meter, fft: fft };
 };
