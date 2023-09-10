@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { SongInfo } from "./SongInfo";
 import { Sequencer } from "./Sequencer";
-import { ProgressionDetails, SongSynths } from "../helpers/types/types";
+import { ProgressionDetails } from "../helpers/types/types";
 import { Lyrics } from "./Lyrics";
 import { LyricLine } from "../helpers/api/api";
 import { Output } from "webmidi";
