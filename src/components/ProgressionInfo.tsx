@@ -36,10 +36,14 @@ const ChordContainer = styled.div`
   margin-bottom: 25px;
 `;
 
-const ProgressionContainer = styled.div<{ isActive: boolean }>`
+const ProgressionContainer = styled.div<{
+  isActive: boolean;
+  isOnDeck: boolean;
+}>`
   opacity: ${(p) => (p.isActive ? "1" : "0.2")};
-  filter: grayscale(100%);
-  background-color: ${(p) => (p.isActive ? "white" : "#D3D3D3")};
+  background-color: ${(p) =>
+    p.isActive ? "white" : p.isOnDeck ? "green" : "#D3D3D3"};
+  cursor: pointer;
 `;
 
 const SwiperSlideContainer = styled.div``;
@@ -48,11 +52,18 @@ type ProgressionInfoProps = {
   progressions: Array<ProgressionDetails>;
   playingIndex: number;
   deleteProgressionCallback: (idx: number) => void;
+  queueProgressionCallback: (idx: number) => void;
+  loopOnDeck: number;
 };
 
 export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
-  const { progressions, playingIndex, deleteProgressionCallback } =
-    progressionInfoProps;
+  const {
+    progressions,
+    playingIndex,
+    deleteProgressionCallback,
+    loopOnDeck,
+    queueProgressionCallback,
+  } = progressionInfoProps;
 
   const sliderRef = useRef<Carousel>(null);
 
@@ -91,7 +102,13 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
       >
         {progressions.map((p, i) => (
           <SwiperSlideContainer key={i}>
-            <ProgressionContainer isActive={i === playingIndex}>
+            <ProgressionContainer
+              isActive={i === playingIndex}
+              isOnDeck={i === loopOnDeck}
+              onClick={() => {
+                queueProgressionCallback(i);
+              }}
+            >
               <KeyInfoContainer>
                 <ProgressionText>
                   <Text>

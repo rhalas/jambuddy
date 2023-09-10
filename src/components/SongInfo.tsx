@@ -19,6 +19,8 @@ type SongInfoProps = {
   setShowNotation: Dispatch<SetStateAction<boolean>>;
   midiOutputs: Array<Output>;
   deleteProgressionCallback: (idx: number) => void;
+  queueProgressionCallback: (idx: number) => void;
+  loopOnDeck: number;
 };
 
 export const SongInfo = (songInfoProps: SongInfoProps) => {
@@ -31,6 +33,8 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
     showNotation,
     setShowNotation,
     deleteProgressionCallback,
+    queueProgressionCallback,
+    loopOnDeck,
   } = songInfoProps;
 
   return (
@@ -40,6 +44,8 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           progressions={progressions}
           playingIndex={playingIndex}
           deleteProgressionCallback={deleteProgressionCallback}
+          loopOnDeck={loopOnDeck}
+          queueProgressionCallback={queueProgressionCallback}
         />
         <Flex justify="center" align="center" gap="9" style={{ height: 40 }}>
           <Button

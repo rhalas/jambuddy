@@ -59,27 +59,14 @@ export const makeLeadSynth = (): TrackSynth => {
   const fft = new Tone.FFT(64);
 
   const newLeadSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -2,
+    volume: 0,
     oscillator: {
-      type: "amsawtooth3",
+      type: "fmsawtooth11",
     },
     portamento: 0.005,
-  }).fan(meter, fft);
-
-  const reverb = new Tone.Reverb({
-    decay: 10.0,
-    preDelay: 0.01,
-  }).toDestination();
-
-  const chorus = new Tone.Chorus({
-    frequency: 1.5,
-    delayTime: 3.5,
-    depth: 0.7,
-    type: "sine",
-    spread: 180,
-  }).connect(reverb);
-
-  newLeadSynth.connect(chorus);
+  })
+    .fan(meter, fft)
+    .toDestination();
 
   return { polySynth: newLeadSynth, meter: meter, fft: fft };
 };
@@ -111,11 +98,9 @@ export const makeRhythmSynth = (): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
-  const newRhythmSynth = new Tone.PolySynth(Tone.Synth)
-    .fan(meter, fft)
-    .toDestination();
+  const newRhythmSynth = new Tone.PolySynth(Tone.Synth).fan(meter, fft);
   newRhythmSynth.set({
-    volume: -8,
+    volume: 3,
     oscillator: {
       type: "fatsine9",
     },
@@ -135,7 +120,7 @@ export const makeBassSynth = (): TrackSynth => {
   const fft = new Tone.FFT(64);
 
   const newBassSynth = new Tone.PolySynth(Tone.Synth, {
-    volume: -4,
+    volume: 0,
     oscillator: {
       type: "sawtooth",
     },

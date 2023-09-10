@@ -2,11 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import * as Tone from "tone";
 import { makeNewSongSynths } from "../helpers/music/synths";
-import {
-  TrackData,
-  ProgressionDetails,
-  SongSynths,
-} from "../helpers/types/types";
+import { ProgressionDetails, SongSynths } from "../helpers/types/types";
 import { makeTrackLoop } from "../helpers/music/sounds";
 import { generateNewProgression, prepareTempo } from "../helpers/music/music";
 import { createSongTracks } from "../helpers/music/tracks";
@@ -25,23 +21,36 @@ function App() {
   >([]);
   const [playingProgressionIndex, setPlayingProgressionIndex] =
     useState<number>(0);
-  const [ranCheckThisBar, setRanCheckThisBar] = useState<boolean>(false);
+  const [ranCheckThisLoop, setRanCheckThisLoop] = useState<boolean>(false);
   const [tempo, setTempo] = useState<number>(-1);
   const [beatNumber, setBeatNumber] = useState<number>(-1);
   const [songTitle, setSongTitle] = useState<string>("");
 
   const [lyrics, setLyrics] = useState<Array<LyricLine>>([]);
-  const [currentLyricIndex, setCurrentLyricIndex] = useState<number>(0);
 
-  const [loopOnDeck, setLoopOnDeck] = useState<boolean>(false);
+  const [nextProgressionIndex, setNextProgressionIndex] = useState<number>(0);
+
+  const [firstSongInitDone, setFirstSongInitDone] = useState<boolean>(false);
 
   const [currentWord, setCurrentWord] = useState<number>(0);
   const [promptDone, setPromptDone] = useState<boolean>(false);
 
   const [insturmentLoops, setInstrumentLoops] = useState<Array<Tone.Loop>>([]);
 
+  useEffect(() => {
+    if (createdProgressions.length === 0) {
+      setNextProgressionIndex(0);
+    } else if (createdProgressions.length === 2) {
+      setNextProgressionIndex(1);
+    }
+  }, [createdProgressions]);
+
   const prepareNextLoop = useCallback(
-    (newTracks: Array<TrackData>) => {
+    (progressionNum: number) => {
+      if (createdProgressions.length === 0) {
+        return;
+      }
+      const newTracks = createdProgressions[progressionNum].tracks;
       const newLoops: Array<Tone.Loop> = newTracks.map((track, index) => {
         return makeTrackLoop(
           track,
@@ -57,92 +66,99 @@ function App() {
       });
       setInstrumentLoops(newLoops);
     },
-    [lyrics, insturmentLoops, midiOutputs]
+    [lyrics, insturmentLoops, midiOutputs, createdProgressions]
   );
 
   useEffect(() => {
-    if (beatNumber % 16 == 0) {
-      if (!ranCheckThisBar) {
-        let nextLyricIndex = currentLyricIndex + 1;
-        if (nextLyricIndex === lyrics.length) {
-          nextLyricIndex = 0;
-        }
+    prepareNextLoop(nextProgressionIndex);
+  }, [nextProgressionIndex, createdProgressions]);
 
-        if (playingProgressionIndex < createdProgressions.length - 1) {
-          nextLyricIndex = 0;
-          setCurrentWord(0);
-          prepareNextLoop(
-            createdProgressions[playingProgressionIndex + 1].tracks
-          );
-          setPlayingProgressionIndex((s) => s + 1);
-          setLoopOnDeck(true);
-        } else {
-          setLoopOnDeck(false);
-        }
-
-        setCurrentLyricIndex(nextLyricIndex);
-        setRanCheckThisBar(true);
-      }
-    } else {
-      setRanCheckThisBar(false);
-    }
-  }, [
-    ranCheckThisBar,
-    beatNumber,
-    createdProgressions,
-    playingProgressionIndex,
-    prepareNextLoop,
-    tempo,
-    loopOnDeck,
-    currentLyricIndex,
-    lyrics,
-    setCurrentLyricIndex,
-    currentWord,
-  ]);
-
-  const makeNewSong = useCallback(
-    async (synths: SongSynths) => {
+  const makeNewSong = useCallback(async () => {
+    if (songSynths) {
       const newProgressionDetail = generateNewProgression();
-
-      const newSongInfo = await createSongTracks(newProgressionDetail, synths);
-
+      const newSongInfo = await createSongTracks(
+        newProgressionDetail,
+        songSynths
+      );
       newProgressionDetail.tracks = Object.values(newSongInfo);
-
-      prepareTempo(tempo, setTempo);
-
-      if (!loopOnDeck) {
-        prepareNextLoop(newProgressionDetail.tracks);
-        setLoopOnDeck(true);
-      }
-
       setCreatedProgressions((s) => [...s, newProgressionDetail]);
-    },
-    [loopOnDeck, prepareNextLoop, tempo]
-  );
-
-  useEffect(() => {
-    if (promptDone) {
-      const newSongSynths = makeNewSongSynths();
-      scheduleBeatIncrement(setBeatNumber);
-      setSongSynths(newSongSynths);
-      makeNewSong(newSongSynths);
-      setPromptDone(false);
     }
-  }, [promptDone, makeNewSong]);
+  }, [songSynths]);
 
   const deleteProgression = useCallback(
     (idx: number) => {
       createdProgressions.splice(idx, 1);
       if (playingProgressionIndex + 1 < createdProgressions.length) {
-        prepareNextLoop(
-          createdProgressions[playingProgressionIndex + 1].tracks
-        );
+        prepareNextLoop(-1);
       } else {
-        prepareNextLoop(createdProgressions[playingProgressionIndex].tracks);
+        prepareNextLoop(-1);
       }
     },
     [createdProgressions, prepareNextLoop, playingProgressionIndex]
   );
+
+  const queueProgression = useCallback(
+    (idx: number) => {
+      prepareNextLoop(idx);
+      setNextProgressionIndex(idx);
+    },
+    [prepareNextLoop]
+  );
+
+  useEffect(() => {
+    if (createdProgressions.length >= 1 && beatNumber % 16 == 0) {
+      if (!ranCheckThisLoop) {
+        setCurrentWord(0);
+        setPlayingProgressionIndex(nextProgressionIndex);
+
+        if (nextProgressionIndex === createdProgressions.length - 1) {
+          setNextProgressionIndex(0);
+        } else {
+          setNextProgressionIndex((s) => s + 1);
+        }
+
+        setRanCheckThisLoop(true);
+      }
+    } else {
+      setRanCheckThisLoop(false);
+    }
+  }, [
+    ranCheckThisLoop,
+    beatNumber,
+    createdProgressions,
+    prepareNextLoop,
+    currentWord,
+    nextProgressionIndex,
+  ]);
+
+  useEffect(() => {
+    if (promptDone) {
+      const newSongSynths = makeNewSongSynths();
+      setSongSynths(newSongSynths);
+      setPromptDone(false);
+    }
+  }, [promptDone]);
+
+  useEffect(() => {
+    if (songSynths && !firstSongInitDone) {
+      const initFirstSong = async () => {
+        setFirstSongInitDone(true);
+        await makeNewSong();
+
+        setPlayingProgressionIndex(0);
+        prepareTempo(tempo, setTempo);
+        scheduleBeatIncrement(setBeatNumber);
+      };
+      initFirstSong();
+    }
+  }, [
+    songSynths,
+    makeNewSong,
+    tempo,
+    firstSongInitDone,
+    createdProgressions,
+    prepareNextLoop,
+  ]);
 
   return (
     <div>
@@ -153,18 +169,21 @@ function App() {
           setLyrics={setLyrics}
         />
       ) : (
-        <SongPlayer
-          createdProgressions={createdProgressions}
-          playingProgressionIndex={playingProgressionIndex}
-          tempo={tempo}
-          songTitle={songTitle}
-          songSynths={songSynths}
-          makeNewSong={makeNewSong}
-          lyrics={lyrics}
-          currentWord={currentWord}
-          midiOutputs={midiOutputs}
-          deleteProgressionCallback={deleteProgression}
-        />
+        <>
+          <SongPlayer
+            createdProgressions={createdProgressions}
+            playingProgressionIndex={playingProgressionIndex}
+            tempo={tempo}
+            songTitle={songTitle}
+            makeNewSong={makeNewSong}
+            lyrics={lyrics}
+            currentWord={currentWord}
+            midiOutputs={midiOutputs}
+            deleteProgressionCallback={deleteProgression}
+            queueProgressionCallback={queueProgression}
+            loopOnDeck={nextProgressionIndex}
+          />
+        </>
       )}
     </div>
   );

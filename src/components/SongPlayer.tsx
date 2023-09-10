@@ -21,12 +21,13 @@ type SongPlayerProps = {
   playingProgressionIndex: number;
   tempo: number;
   songTitle: string;
-  songSynths?: SongSynths;
-  makeNewSong: (synths: SongSynths) => void;
+  makeNewSong: () => void;
   lyrics: Array<LyricLine>;
   currentWord: number;
   midiOutputs: Array<Output>;
   deleteProgressionCallback: (idx: number) => void;
+  queueProgressionCallback: (idx: number) => void;
+  loopOnDeck: number;
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
@@ -38,11 +39,12 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     tempo,
     songTitle,
     makeNewSong,
-    songSynths,
     lyrics,
     currentWord,
     midiOutputs,
     deleteProgressionCallback,
+    loopOnDeck,
+    queueProgressionCallback,
   } = songPlayerProps;
 
   return (
@@ -53,12 +55,14 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
           playingIndex={playingProgressionIndex}
           tempo={tempo}
           addNewChordCallback={() => {
-            makeNewSong(songSynths!);
+            makeNewSong();
           }}
           midiOutputs={midiOutputs}
           showNotation={showNotation}
           setShowNotation={setShowNotation}
           deleteProgressionCallback={deleteProgressionCallback}
+          loopOnDeck={loopOnDeck}
+          queueProgressionCallback={queueProgressionCallback}
         />
         <Sequencer
           tracks={createdProgressions[playingProgressionIndex].tracks}
