@@ -6,6 +6,8 @@ import {
   ToneToEighths,
 } from "./types";
 
+export const DEFAULT_TRACK_VOLUME = 0;
+
 export const BEATS_PER_BAR = 4;
 export const NUMBER_OF_BEATS = 16;
 export const NUMBER_OF_BARS = NUMBER_OF_BEATS / BEATS_PER_BAR;

@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { TrackData } from "../helpers/types/types";
 import { Visualizer } from "./Visualizer";
+import { MuteControl } from "./MuteControl";
 
 type TrackProps = {
   trackData: TrackData;
@@ -26,6 +27,7 @@ export const Track = (trackProps: TrackProps) => {
 
   return (
     <TrackContainer>
+      <MuteControl trackVolume={trackData.synth.volumeControl} />
       <InstrumentLabel>{trackData.name}</InstrumentLabel>
       <Visualizer meter={trackData.synth.meter} fft={trackData.synth.fft} />
     </TrackContainer>

@@ -38,6 +38,7 @@ export type TrackSynth = {
   samplePlayers?: SamplePlayers;
   meter: Tone.Meter;
   fft: Tone.FFT;
+  volumeControl: Tone.Volume;
 };
 
 export type TrackData = {

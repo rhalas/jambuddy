@@ -11,6 +11,7 @@ import {
   BEATS_PER_BAR,
   NUMBER_OF_BEATS,
   chordUrls,
+  DEFAULT_TRACK_VOLUME,
 } from "../types/music_types";
 import { makeNewTrack, addNewBeatToTrack } from "../utils/track_utils";
 import * as Tone from "tone";
@@ -248,9 +249,11 @@ const generateGuitarRhythmTrack = async (
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
+  const vol = new Tone.Volume(DEFAULT_TRACK_VOLUME).connect(masterVol);
   const newGuitarRhythmTrack = makeNewTrack("Guitar", {
     meter: meter,
     fft: fft,
+    volumeControl: vol,
   });
   const chordsToFetch = progression.map((p) => p.chordName);
   newGuitarRhythmTrack.synth.samplePlayers = {};
@@ -260,7 +263,7 @@ const generateGuitarRhythmTrack = async (
     const listOfChords = Object.keys(chordUrls);
     if (listOfChords.includes(chordsToFetch[i])) {
       await newPlayer.load(chordUrls[chordsToFetch[i]]);
-      newPlayer.volume.value = -7;
+      newPlayer.volume.value = DEFAULT_TRACK_VOLUME;
 
       newGuitarRhythmTrack.beats.push({
         label: chordsToFetch[i],
