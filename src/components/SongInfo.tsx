@@ -43,6 +43,7 @@ type SongInfoProps = {
   deleteProgressionCallback: (idx: number) => void;
   queueProgressionCallback: (idx: number) => void;
   loopOnDeck: number;
+  currentChordPosition: number;
 };
 
 export const SongInfo = (songInfoProps: SongInfoProps) => {
@@ -57,6 +58,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
     deleteProgressionCallback,
     queueProgressionCallback,
     loopOnDeck,
+    currentChordPosition,
   } = songInfoProps;
 
   return (
@@ -68,6 +70,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           deleteProgressionCallback={deleteProgressionCallback}
           loopOnDeck={loopOnDeck}
           queueProgressionCallback={queueProgressionCallback}
+          currentChordPosition={currentChordPosition}
         />
         <Flex justify="center" align="center" gap="9" style={{ height: 40 }}>
           <Button

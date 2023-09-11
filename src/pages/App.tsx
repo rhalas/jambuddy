@@ -38,6 +38,7 @@ function App() {
 
   const [insturmentLoops, setInstrumentLoops] = useState<Array<Tone.Loop>>([]);
   const [volumeLevel, setVolumeLevel] = useState<number>(0);
+  const [currentChordPosition, setCurrentChordPosition] = useState<number>(0);
 
   useEffect(() => {
     if (createdProgressions.length === 0) {
@@ -129,21 +130,27 @@ function App() {
   );
 
   useEffect(() => {
-    if (createdProgressions.length >= 1 && beatNumber % 16 == 0) {
-      if (!ranCheckThisLoop) {
-        setCurrentWord(0);
-        setPlayingProgressionIndex(nextProgressionIndex);
-
-        if (nextProgressionIndex === createdProgressions.length - 1) {
-          setNextProgressionIndex(0);
-        } else {
-          setNextProgressionIndex((s) => s + 1);
-        }
-
-        setRanCheckThisLoop(true);
+    if (createdProgressions.length >= 1) {
+      if (beatNumber % 4 == 0) {
+        setCurrentChordPosition(Math.floor(beatNumber / 4) % 4);
       }
-    } else {
-      setRanCheckThisLoop(false);
+
+      if (beatNumber % 16 == 0) {
+        if (!ranCheckThisLoop) {
+          setCurrentWord(0);
+          setPlayingProgressionIndex(nextProgressionIndex);
+
+          if (nextProgressionIndex === createdProgressions.length - 1) {
+            setNextProgressionIndex(0);
+          } else {
+            setNextProgressionIndex((s) => s + 1);
+          }
+
+          setRanCheckThisLoop(true);
+        }
+      } else {
+        setRanCheckThisLoop(false);
+      }
     }
   }, [
     ranCheckThisLoop,
@@ -213,6 +220,7 @@ function App() {
             loopOnDeck={nextProgressionIndex}
             setVolumeLevel={setVolumeLevel}
             volumeLevel={volumeLevel}
+            currentChordPosition={currentChordPosition}
           />
         </>
       )}

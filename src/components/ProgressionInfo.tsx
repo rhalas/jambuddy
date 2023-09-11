@@ -36,6 +36,12 @@ const ChordContainer = styled.div`
   margin-bottom: 25px;
 `;
 
+const ChordText = styled.span<{
+  isActive: boolean;
+}>`
+  background-color: ${(p) => (p.isActive ? `var(--accent-6)` : "")};
+`;
+
 const ProgressionContainer = styled.div<{
   isActive: boolean;
   isOnDeck: boolean;
@@ -54,6 +60,7 @@ type ProgressionInfoProps = {
   deleteProgressionCallback: (idx: number) => void;
   queueProgressionCallback: (idx: number) => void;
   loopOnDeck: number;
+  currentChordPosition: number;
 };
 
 export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
@@ -63,6 +70,7 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
     deleteProgressionCallback,
     loopOnDeck,
     queueProgressionCallback,
+    currentChordPosition,
   } = progressionInfoProps;
 
   const sliderRef = useRef<Carousel>(null);
@@ -126,14 +134,39 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
               <ChordContainer>
                 <Text>
                   {p.progression &&
-                    p.progression.map((c: ChordInfo) => c.position).join(" - ")}
+                    p.progression.map((c: ChordInfo, idx: number) => {
+                      return (
+                        <>
+                          <ChordText
+                            isActive={
+                              idx === currentChordPosition && i === playingIndex
+                            }
+                          >
+                            {` ${c.position} `}
+                          </ChordText>
+                          {idx !== p.progression.length - 1 ? "-" : ""}
+                        </>
+                      );
+                    })}
                 </Text>
                 <div>
                   <Text>
                     {p.progression &&
-                      p.progression
-                        .map((c: ChordInfo) => c.chordName)
-                        .join(" - ")}
+                      p.progression.map((c: ChordInfo, idx: number) => {
+                        return (
+                          <>
+                            <ChordText
+                              isActive={
+                                idx === currentChordPosition &&
+                                i === playingIndex
+                              }
+                            >
+                              {` ${c.chordName} `}
+                            </ChordText>
+                            {idx !== p.progression.length - 1 ? "-" : ""}
+                          </>
+                        );
+                      })}
                   </Text>
                 </div>
               </ChordContainer>
