@@ -6,6 +6,8 @@ import { Lyrics } from "./Lyrics";
 import { LyricLine } from "../helpers/api/api";
 import { Output } from "webmidi";
 import { useState } from "react";
+import { VolumeSlider } from "./VolumeSlider";
+import { Dispatch, SetStateAction } from "react";
 
 const SongPlayerContainer = styled.div`
   display: flex;
@@ -28,6 +30,8 @@ type SongPlayerProps = {
   deleteProgressionCallback: (idx: number) => void;
   queueProgressionCallback: (idx: number) => void;
   loopOnDeck: number;
+  setVolumeLevel: Dispatch<SetStateAction<number>>;
+  volumeLevel: number;
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
@@ -45,31 +49,40 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     deleteProgressionCallback,
     loopOnDeck,
     queueProgressionCallback,
+    setVolumeLevel,
+    volumeLevel,
   } = songPlayerProps;
 
   return (
-    <SongPlayerContainer>
-      <SongDetailsContainer>
-        <SongInfo
-          progressions={createdProgressions}
-          playingIndex={playingProgressionIndex}
-          tempo={tempo}
-          addNewChordCallback={() => {
-            makeNewSong();
-          }}
-          midiOutputs={midiOutputs}
-          showNotation={showNotation}
-          setShowNotation={setShowNotation}
-          deleteProgressionCallback={deleteProgressionCallback}
-          loopOnDeck={loopOnDeck}
-          queueProgressionCallback={queueProgressionCallback}
+    <>
+      <VolumeSlider volumeLevel={volumeLevel} setVolumeLevel={setVolumeLevel} />
+      <SongPlayerContainer>
+        <SongDetailsContainer>
+          <SongInfo
+            progressions={createdProgressions}
+            playingIndex={playingProgressionIndex}
+            tempo={tempo}
+            addNewChordCallback={() => {
+              makeNewSong();
+            }}
+            midiOutputs={midiOutputs}
+            showNotation={showNotation}
+            setShowNotation={setShowNotation}
+            deleteProgressionCallback={deleteProgressionCallback}
+            loopOnDeck={loopOnDeck}
+            queueProgressionCallback={queueProgressionCallback}
+          />
+          <Sequencer
+            tracks={createdProgressions[playingProgressionIndex].tracks}
+            showNotation={showNotation}
+          />
+        </SongDetailsContainer>
+        <Lyrics
+          lyrics={lyrics}
+          songTitle={songTitle}
+          currentWord={currentWord}
         />
-        <Sequencer
-          tracks={createdProgressions[playingProgressionIndex].tracks}
-          showNotation={showNotation}
-        />
-      </SongDetailsContainer>
-      <Lyrics lyrics={lyrics} songTitle={songTitle} currentWord={currentWord} />
-    </SongPlayerContainer>
+      </SongPlayerContainer>
+    </>
   );
 };

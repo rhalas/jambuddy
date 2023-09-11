@@ -80,6 +80,7 @@ export type ProgressionDetails = {
 };
 
 export type SongSynths = {
+  masterVol: Tone.Volume;
   rhythm: TrackSynth;
   lead: TrackSynth;
   vocal: TrackSynth;

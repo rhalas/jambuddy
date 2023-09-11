@@ -242,7 +242,8 @@ const generateBassTrack = (
 };
 
 const generateGuitarRhythmTrack = async (
-  progression: Array<ChordInfo>
+  progression: Array<ChordInfo>,
+  masterVol: Tone.Volume
 ): Promise<TrackData> => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
@@ -255,7 +256,7 @@ const generateGuitarRhythmTrack = async (
   newGuitarRhythmTrack.synth.samplePlayers = {};
 
   for (let i = 0; i < chordsToFetch.length; i++) {
-    const newPlayer = new Tone.Player().fan(meter, fft).toDestination();
+    const newPlayer = new Tone.Player().fan(meter, fft).connect(masterVol);
     const listOfChords = Object.keys(chordUrls);
     if (listOfChords.includes(chordsToFetch[i])) {
       await newPlayer.load(chordUrls[chordsToFetch[i]]);
@@ -291,7 +292,8 @@ export const createSongTracks = async (
   const openHiHatTrack = generateOpenHiHatTrack(songSynths.openHiHat);
   const bassTrack = generateBassTrack(songSynths.bass, rhythmTrack);
   const guitarRhythmTrack = await generateGuitarRhythmTrack(
-    progressionDetails.progression
+    progressionDetails.progression,
+    songSynths.masterVol
   );
   const vocalTrack = generateVocalTrack(
     songSynths.vocal,

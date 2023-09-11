@@ -36,6 +36,7 @@ function App() {
   const [promptDone, setPromptDone] = useState<boolean>(false);
 
   const [insturmentLoops, setInstrumentLoops] = useState<Array<Tone.Loop>>([]);
+  const [volumeLevel, setVolumeLevel] = useState<number>(0);
 
   useEffect(() => {
     if (createdProgressions.length === 0) {
@@ -133,11 +134,17 @@ function App() {
 
   useEffect(() => {
     if (promptDone) {
-      const newSongSynths = makeNewSongSynths();
+      const newSongSynths = makeNewSongSynths(volumeLevel);
       setSongSynths(newSongSynths);
       setPromptDone(false);
     }
-  }, [promptDone]);
+  }, [promptDone, volumeLevel]);
+
+  useEffect(() => {
+    if (songSynths) {
+      songSynths.masterVol.volume.value = volumeLevel;
+    }
+  }, [volumeLevel, songSynths]);
 
   useEffect(() => {
     if (songSynths && !firstSongInitDone) {
@@ -182,6 +189,8 @@ function App() {
             deleteProgressionCallback={deleteProgression}
             queueProgressionCallback={queueProgression}
             loopOnDeck={nextProgressionIndex}
+            setVolumeLevel={setVolumeLevel}
+            volumeLevel={volumeLevel}
           />
         </>
       )}

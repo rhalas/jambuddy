@@ -1,26 +1,29 @@
 import * as Tone from "tone";
 import { SongSynths, TrackSynth } from "../types/types";
 
-export const makeNewSongSynths = (): SongSynths => {
+export const makeNewSongSynths = (defaultVolume: number): SongSynths => {
+  const masterVol = new Tone.Volume(defaultVolume).toDestination();
+
   return {
-    rhythm: makeRhythmSynth(),
-    lead: makeLeadSynth(),
-    vocal: makeVocalSynth(),
-    snareDrum: makeSnareDrum(),
-    bassDrum: makeBassDrum(),
-    bass: makeBassSynth(),
-    closedHiHat: makeClosedHiHat(),
-    openHiHat: makeOpenHiHat(),
+    masterVol: masterVol,
+    rhythm: makeRhythmSynth(masterVol),
+    lead: makeLeadSynth(masterVol),
+    vocal: makeVocalSynth(masterVol),
+    snareDrum: makeSnareDrum(masterVol),
+    bassDrum: makeBassDrum(masterVol),
+    bass: makeBassSynth(masterVol),
+    closedHiHat: makeClosedHiHat(masterVol),
+    openHiHat: makeOpenHiHat(masterVol),
   };
 };
 
-export const makeSnareDrum = (): TrackSynth => {
+export const makeSnareDrum = (masterVol: Tone.Volume): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
   const lowPass = new Tone.Filter({
     frequency: 8000,
-  }).toDestination();
+  }).connect(masterVol);
 
   const newSynth = new Tone.NoiseSynth({
     volume: -3,
@@ -41,7 +44,7 @@ export const makeSnareDrum = (): TrackSynth => {
   return { noiseSynth: newSynth, meter: meter, fft: fft };
 };
 
-export const makeBassDrum = (): TrackSynth => {
+export const makeBassDrum = (masterVol: Tone.Volume): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
@@ -49,12 +52,12 @@ export const makeBassDrum = (): TrackSynth => {
     volume: 3,
   })
     .fan(meter, fft)
-    .toDestination();
+    .connect(masterVol);
 
   return { membraneSynth: newSynth, meter: meter, fft: fft };
 };
 
-export const makeLeadSynth = (): TrackSynth => {
+export const makeLeadSynth = (masterVol: Tone.Volume): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
@@ -66,12 +69,12 @@ export const makeLeadSynth = (): TrackSynth => {
     portamento: 0.005,
   })
     .fan(meter, fft)
-    .toDestination();
+    .connect(masterVol);
 
   return { polySynth: newLeadSynth, meter: meter, fft: fft };
 };
 
-export const makeVocalSynth = (): TrackSynth => {
+export const makeVocalSynth = (masterVol: Tone.Volume): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
@@ -81,20 +84,19 @@ export const makeVocalSynth = (): TrackSynth => {
       type: "square",
     },
     portamento: 0.005,
-  })
-    .fan(meter, fft)
-    .toDestination();
+  }).fan(meter, fft);
 
   const reverb = new Tone.Reverb({
     decay: 20.0,
     preDelay: 0.01,
-  }).toDestination();
+  }).connect(masterVol);
+
   newVocalSynth.connect(reverb);
 
   return { polySynth: newVocalSynth, meter: meter, fft: fft };
 };
 
-export const makeRhythmSynth = (): TrackSynth => {
+export const makeRhythmSynth = (masterVol: Tone.Volume): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
@@ -109,13 +111,13 @@ export const makeRhythmSynth = (): TrackSynth => {
   const reverb = new Tone.Reverb({
     decay: 10.0,
     preDelay: 0.01,
-  }).toDestination();
+  }).connect(masterVol);
   newRhythmSynth.connect(reverb);
 
   return { polySynth: newRhythmSynth, meter: meter, fft: fft };
 };
 
-export const makeBassSynth = (): TrackSynth => {
+export const makeBassSynth = (masterVol: Tone.Volume): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
@@ -126,18 +128,18 @@ export const makeBassSynth = (): TrackSynth => {
     },
   })
     .fan(meter, fft)
-    .toDestination();
+    .connect(masterVol);
 
   return { polySynth: newBassSynth, meter: meter, fft: fft };
 };
 
-export const makeClosedHiHat = (): TrackSynth => {
+export const makeClosedHiHat = (masterVol: Tone.Volume): TrackSynth => {
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
 
   const lowPass = new Tone.Filter({
     frequency: 8000,
-  }).toDestination();
+  }).connect(masterVol);
 
   const newHiHatSynth = new Tone.NoiseSynth({
     volume: -5,
@@ -152,10 +154,10 @@ export const makeClosedHiHat = (): TrackSynth => {
   return { noiseSynth: newHiHatSynth, meter: meter, fft: fft };
 };
 
-export const makeOpenHiHat = (): TrackSynth => {
+export const makeOpenHiHat = (masterVol: Tone.Volume): TrackSynth => {
   const lowPass = new Tone.Filter({
     frequency: 14000,
-  }).toDestination();
+  }).connect(masterVol);
 
   const meter = new Tone.Meter();
   const fft = new Tone.FFT(64);
