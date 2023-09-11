@@ -23,7 +23,7 @@ type SongPlayerProps = {
   playingProgressionIndex: number;
   tempo: number;
   songTitle: string;
-  makeNewSong: () => void;
+  addNewLoopCallback: (newLoopType: NewLoopType) => void;
   lyrics: Array<LyricLine>;
   currentWord: number;
   midiOutputs: Array<Output>;
@@ -42,7 +42,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     playingProgressionIndex,
     tempo,
     songTitle,
-    makeNewSong,
+    addNewLoopCallback,
     lyrics,
     currentWord,
     midiOutputs,
@@ -62,9 +62,7 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
             progressions={createdProgressions}
             playingIndex={playingProgressionIndex}
             tempo={tempo}
-            addNewChordCallback={() => {
-              makeNewSong();
-            }}
+            addNewLoopCallback={addNewLoopCallback}
             midiOutputs={midiOutputs}
             showNotation={showNotation}
             setShowNotation={setShowNotation}

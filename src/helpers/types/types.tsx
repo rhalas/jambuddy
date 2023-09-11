@@ -91,3 +91,5 @@ export type SongSynths = {
   closedHiHat: TrackSynth;
   openHiHat: TrackSynth;
 };
+
+export type NewLoopType = "random_key" | "same_key" | "clone_current";

@@ -30,7 +30,10 @@ export const prepareTempo = (
   setTempo(tempoToUse);
 };
 
-export const generateNewProgression = (): ProgressionDetails => {
+export const generateNewProgression = (
+  defaultRoot?: string,
+  defaultMode?: string
+): ProgressionDetails => {
   const newProgressionDetail: ProgressionDetails = {
     rootNote: "",
     mode: "",
@@ -39,9 +42,13 @@ export const generateNewProgression = (): ProgressionDetails => {
     tracks: [],
   };
 
-  const rootNote = notes[Math.floor(Math.random() * notes.length)];
+  const rootNote = defaultRoot
+    ? defaultRoot
+    : notes[Math.floor(Math.random() * notes.length)];
   const listOfModes = Object.keys(progressions);
-  const newMode = listOfModes[Math.floor(Math.random() * listOfModes.length)];
+  const newMode = defaultMode
+    ? defaultMode
+    : listOfModes[Math.floor(Math.random() * listOfModes.length)];
 
   newProgressionDetail.rootNote = rootNote;
   newProgressionDetail.mode = newMode;

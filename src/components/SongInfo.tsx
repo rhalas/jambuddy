@@ -1,4 +1,4 @@
-import { ProgressionDetails } from "../helpers/types/types";
+import { ProgressionDetails, NewLoopType } from "../helpers/types/types";
 import styled from "styled-components";
 import { exportToMidi } from "../helpers/music/midi";
 import { Button, Text, Flex } from "@radix-ui/themes";
@@ -9,12 +9,34 @@ import { Output } from "webmidi";
 import { Dispatch, SetStateAction } from "react";
 
 const SongInfoContainer = styled.div``;
+const MidiOutputContainer = styled(Button)`
+  padding: 0;
+`;
+
+const DropDownContent = styled(DropdownMenu.Content)`
+  min-width: 220px;
+  background-color: white;
+  border-radius: 6px;
+  padding: 5px;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+`;
+
+const DropdownCheckboxItem = styled(DropdownMenu.CheckboxItem)`
+  cursor: pointer;
+  &:hover {
+    background-color: lightblue;
+  }
+`;
 
 type SongInfoProps = {
   progressions: Array<ProgressionDetails>;
   playingIndex: number;
   tempo: number;
-  addNewChordCallback: () => void;
+  addNewLoopCallback: (newLoopType: NewLoopType) => void;
   showNotation: boolean;
   setShowNotation: Dispatch<SetStateAction<boolean>>;
   midiOutputs: Array<Output>;
@@ -28,7 +50,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
     progressions,
     playingIndex,
     tempo,
-    addNewChordCallback,
+    addNewLoopCallback,
     midiOutputs,
     showNotation,
     setShowNotation,
@@ -57,15 +79,32 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           >
             <Text>{showNotation ? "Show Visualization" : "Show Notation"}</Text>
           </Button>
-          <Button
-            size="3"
-            variant="solid"
-            onClick={() => {
-              addNewChordCallback();
-            }}
-          >
-            <Text>Add more music</Text>
-          </Button>
+
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <MidiOutputContainer size="3" variant="solid">
+                Add a new loop
+                <CaretDownIcon />
+              </MidiOutputContainer>
+            </DropdownMenu.Trigger>
+            <DropDownContent>
+              <DropdownCheckboxItem
+                onClick={() => addNewLoopCallback("clone_current")}
+              >
+                <Text>Clone current</Text>
+              </DropdownCheckboxItem>
+              <DropdownCheckboxItem
+                onClick={() => addNewLoopCallback("same_key")}
+              >
+                <Text>Same key</Text>
+              </DropdownCheckboxItem>
+              <DropdownCheckboxItem
+                onClick={() => addNewLoopCallback("random_key")}
+              >
+                <Text>New key</Text>
+              </DropdownCheckboxItem>
+            </DropDownContent>
+          </DropdownMenu.Root>
           <Button
             size="3"
             variant="solid"
@@ -77,27 +116,23 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           </Button>
           <DropdownMenu.Root>
             <DropdownMenu.Trigger>
-              <Button size="3" variant="solid">
+              <MidiOutputContainer size="3" variant="solid">
                 MIDI Outputs
                 <CaretDownIcon />
-              </Button>
+              </MidiOutputContainer>
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content>
+            <DropDownContent>
               {midiOutputs.map((outputDevice, index) => {
                 return (
-                  <DropdownMenu.CheckboxItem
-                    className="DropdownMenuCheckboxItem"
-                    checked={index == 0}
-                    key={index}
-                  >
-                    <DropdownMenu.ItemIndicator className="DropdownMenuItemIndicator">
+                  <DropdownCheckboxItem checked={index == 0} key={index}>
+                    <DropdownMenu.ItemIndicator>
                       <CheckIcon />
                     </DropdownMenu.ItemIndicator>
                     {outputDevice.name}
-                  </DropdownMenu.CheckboxItem>
+                  </DropdownCheckboxItem>
                 );
               })}
-            </DropdownMenu.Content>
+            </DropDownContent>
           </DropdownMenu.Root>
         </Flex>{" "}
       </SongInfoContainer>

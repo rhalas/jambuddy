@@ -11,6 +11,7 @@ import { SongPlayer } from "../components/SongPlayer";
 import { LyricLine } from "../helpers/api/api";
 import { useMIDI } from "../hooks/useMidi";
 import { scheduleBeatIncrement } from "../helpers/music/schedule";
+import { NewLoopType } from "../helpers/types/types";
 
 function App() {
   const { midiOutputs } = useMIDI();
@@ -74,17 +75,38 @@ function App() {
     prepareNextLoop(nextProgressionIndex);
   }, [nextProgressionIndex, createdProgressions]);
 
-  const makeNewSong = useCallback(async () => {
-    if (songSynths) {
-      const newProgressionDetail = generateNewProgression();
-      const newSongInfo = await createSongTracks(
-        newProgressionDetail,
-        songSynths
-      );
-      newProgressionDetail.tracks = Object.values(newSongInfo);
-      setCreatedProgressions((s) => [...s, newProgressionDetail]);
-    }
-  }, [songSynths]);
+  const makeNewSong = useCallback(
+    async (newLoopType: NewLoopType) => {
+      if (songSynths) {
+        if (newLoopType === "random_key") {
+          const newProgressionDetail = generateNewProgression();
+          const newSongInfo = await createSongTracks(
+            newProgressionDetail,
+            songSynths
+          );
+          newProgressionDetail.tracks = Object.values(newSongInfo);
+          setCreatedProgressions((s) => [...s, newProgressionDetail]);
+        } else if (newLoopType === "same_key") {
+          const currProgression = createdProgressions[playingProgressionIndex];
+          const newProgressionDetail = generateNewProgression(
+            currProgression.rootNote,
+            currProgression.mode
+          );
+          const newSongInfo = await createSongTracks(
+            newProgressionDetail,
+            songSynths
+          );
+          newProgressionDetail.tracks = Object.values(newSongInfo);
+          setCreatedProgressions((s) => [...s, newProgressionDetail]);
+        } else if (newLoopType === "clone_current") {
+          const newProgressionDetail =
+            createdProgressions[playingProgressionIndex];
+          setCreatedProgressions((s) => [...s, newProgressionDetail]);
+        }
+      }
+    },
+    [songSynths, createdProgressions, playingProgressionIndex]
+  );
 
   const deleteProgression = useCallback(
     (idx: number) => {
@@ -150,7 +172,7 @@ function App() {
     if (songSynths && !firstSongInitDone) {
       const initFirstSong = async () => {
         setFirstSongInitDone(true);
-        await makeNewSong();
+        await makeNewSong("random_key");
 
         setPlayingProgressionIndex(0);
         prepareTempo(tempo, setTempo);
@@ -182,7 +204,7 @@ function App() {
             playingProgressionIndex={playingProgressionIndex}
             tempo={tempo}
             songTitle={songTitle}
-            makeNewSong={makeNewSong}
+            addNewLoopCallback={makeNewSong}
             lyrics={lyrics}
             currentWord={currentWord}
             midiOutputs={midiOutputs}
