@@ -10,6 +10,7 @@ type VolumeSliderProps = {
 const SliderContainer = styled.div`
   width: 300px;
   margin: auto;
+  padding-bottom: 10px;
 `;
 
 export const VolumeSlider = (volumeSliderProps: VolumeSliderProps) => {

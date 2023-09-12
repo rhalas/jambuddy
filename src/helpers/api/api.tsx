@@ -29,12 +29,13 @@ const GetBaseUrl = () => {
 export const GetSong = async (songTheme: string): Promise<GetSongResponse> => {
   const res: GetSongResponse = { title: "", lyrics: [] };
   try {
+    const songTopic = songTheme === "" ? "something totally random" : songTheme;
     const response = await fetch(`${GetBaseUrl()}${GET_SONG_PATH}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ song_theme: songTheme }),
+      body: JSON.stringify({ song_theme: songTopic }),
     });
 
     const result = await response.json();

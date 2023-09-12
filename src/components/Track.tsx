@@ -12,7 +12,7 @@ const TrackContainer = styled.div`
   align-items: center;
   margin-top: 10px;
   border-bottom: dashed #03c03c;
-  height: 50px;
+  height: 45px;
 `;
 
 const InstrumentLabel = styled.div`

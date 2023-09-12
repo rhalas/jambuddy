@@ -13,7 +13,7 @@ const VisualizerContainer = styled.div`
 `;
 
 const width = 950;
-const height = 60;
+const height = 50;
 
 export const Visualizer = (props: VisualizerProps) => {
   const setup = (p5: p5Types, canvasParentRef: Element) => {
