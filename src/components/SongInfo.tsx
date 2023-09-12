@@ -13,11 +13,15 @@ const MidiOutputContainer = styled(Button)`
   padding: 0;
 `;
 
+const ControlBar = styled.div`
+  margin-top: 20px;
+`;
+
 const DropDownContent = styled(DropdownMenu.Content)`
   min-width: 220px;
   background-color: white;
   border-radius: 6px;
-  padding: 5px;
+  padding: 5px;CaretDownIcon
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation-duration: 400ms;
@@ -36,7 +40,12 @@ type SongInfoProps = {
   progressions: Array<ProgressionDetails>;
   playingIndex: number;
   tempo: number;
-  addNewLoopCallback: (newLoopType: NewLoopType) => void;
+  addNewLoopCallback: (
+    newLoopType: NewLoopType,
+    progressionUpdateIndex?: number,
+    newMode?: string,
+    newRoot?: string
+  ) => void;
   showNotation: boolean;
   setShowNotation: Dispatch<SetStateAction<boolean>>;
   midiOutputs: Array<Output>;
@@ -44,6 +53,8 @@ type SongInfoProps = {
   queueProgressionCallback: (idx: number) => void;
   loopOnDeck: number;
   currentChordPosition: number;
+  editModeIndex: number;
+  setEditModeIndex: Dispatch<SetStateAction<number>>;
 };
 
 export const SongInfo = (songInfoProps: SongInfoProps) => {
@@ -59,6 +70,8 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
     queueProgressionCallback,
     loopOnDeck,
     currentChordPosition,
+    editModeIndex,
+    setEditModeIndex,
   } = songInfoProps;
 
   return (
@@ -71,73 +84,91 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           loopOnDeck={loopOnDeck}
           queueProgressionCallback={queueProgressionCallback}
           currentChordPosition={currentChordPosition}
+          editModeIndex={editModeIndex}
+          setEditModeIndex={setEditModeIndex}
+          updateLoop={(
+            progressionIdx: number,
+            newMode?: string,
+            newRoot?: string
+          ) => {
+            addNewLoopCallback(
+              "update_existing",
+              progressionIdx,
+              newMode,
+              newRoot
+            );
+          }}
         />
-        <Flex justify="center" align="center" gap="9" style={{ height: 40 }}>
-          <Button
-            size="3"
-            variant="solid"
-            onClick={() => {
-              setShowNotation((s) => !s);
-            }}
-          >
-            <Text>{showNotation ? "Show Visualization" : "Show Notation"}</Text>
-          </Button>
+        <ControlBar>
+          <Flex justify="center" align="center" gap="9" style={{ height: 40 }}>
+            <Button
+              size="3"
+              variant="solid"
+              onClick={() => {
+                setShowNotation((s) => !s);
+              }}
+            >
+              <Text>
+                {showNotation ? "Show Visualization" : "Show Notation"}
+              </Text>
+            </Button>
 
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger>
-              <MidiOutputContainer size="3" variant="solid">
-                Add a new loop
-                <CaretDownIcon />
-              </MidiOutputContainer>
-            </DropdownMenu.Trigger>
-            <DropDownContent>
-              <DropdownCheckboxItem
-                onClick={() => addNewLoopCallback("clone_current")}
-              >
-                <Text>Clone current</Text>
-              </DropdownCheckboxItem>
-              <DropdownCheckboxItem
-                onClick={() => addNewLoopCallback("same_key")}
-              >
-                <Text>Same key</Text>
-              </DropdownCheckboxItem>
-              <DropdownCheckboxItem
-                onClick={() => addNewLoopCallback("random_key")}
-              >
-                <Text>New key</Text>
-              </DropdownCheckboxItem>
-            </DropDownContent>
-          </DropdownMenu.Root>
-          <Button
-            size="3"
-            variant="solid"
-            onClick={() => {
-              exportToMidi(progressions[playingIndex].tracks, tempo);
-            }}
-          >
-            <Text>Export MIDI</Text>
-          </Button>
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger>
-              <MidiOutputContainer size="3" variant="solid">
-                MIDI Outputs
-                <CaretDownIcon />
-              </MidiOutputContainer>
-            </DropdownMenu.Trigger>
-            <DropDownContent>
-              {midiOutputs.map((outputDevice, index) => {
-                return (
-                  <DropdownCheckboxItem checked={index == 0} key={index}>
-                    <DropdownMenu.ItemIndicator>
-                      <CheckIcon />
-                    </DropdownMenu.ItemIndicator>
-                    {outputDevice.name}
-                  </DropdownCheckboxItem>
-                );
-              })}
-            </DropDownContent>
-          </DropdownMenu.Root>
-        </Flex>{" "}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                <MidiOutputContainer size="3" variant="solid">
+                  Add a new loop
+                  <CaretDownIcon />
+                </MidiOutputContainer>
+              </DropdownMenu.Trigger>
+              <DropDownContent>
+                <DropdownCheckboxItem
+                  onClick={() => addNewLoopCallback("clone_current")}
+                >
+                  <Text>Clone current</Text>
+                </DropdownCheckboxItem>
+                <DropdownCheckboxItem
+                  onClick={() => addNewLoopCallback("same_key")}
+                >
+                  <Text>Same key</Text>
+                </DropdownCheckboxItem>
+                <DropdownCheckboxItem
+                  onClick={() => addNewLoopCallback("random_key")}
+                >
+                  <Text>New key</Text>
+                </DropdownCheckboxItem>
+              </DropDownContent>
+            </DropdownMenu.Root>
+            <Button
+              size="3"
+              variant="solid"
+              onClick={() => {
+                exportToMidi(progressions[playingIndex].tracks, tempo);
+              }}
+            >
+              <Text>Export MIDI</Text>
+            </Button>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                <MidiOutputContainer size="3" variant="solid">
+                  MIDI Outputs
+                  <CaretDownIcon />
+                </MidiOutputContainer>
+              </DropdownMenu.Trigger>
+              <DropDownContent>
+                {midiOutputs.map((outputDevice, index) => {
+                  return (
+                    <DropdownCheckboxItem checked={index == 0} key={index}>
+                      <DropdownMenu.ItemIndicator>
+                        <CheckIcon />
+                      </DropdownMenu.ItemIndicator>
+                      {outputDevice.name}
+                    </DropdownCheckboxItem>
+                  );
+                })}
+              </DropDownContent>
+            </DropdownMenu.Root>
+          </Flex>{" "}
+        </ControlBar>
       </SongInfoContainer>
     )
   );

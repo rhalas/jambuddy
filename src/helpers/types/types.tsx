@@ -92,4 +92,8 @@ export type SongSynths = {
   openHiHat: TrackSynth;
 };
 
-export type NewLoopType = "random_key" | "same_key" | "clone_current";
+export type NewLoopType =
+  | "random_key"
+  | "same_key"
+  | "clone_current"
+  | "update_existing";

@@ -23,7 +23,11 @@ type SongPlayerProps = {
   playingProgressionIndex: number;
   tempo: number;
   songTitle: string;
-  addNewLoopCallback: (newLoopType: NewLoopType) => void;
+  addNewLoopCallback: (
+    newLoopType: NewLoopType,
+    progressionUpdateIndex?: number,
+    newMode?: string
+  ) => void;
   lyrics: Array<LyricLine>;
   currentWord: number;
   midiOutputs: Array<Output>;
@@ -33,6 +37,8 @@ type SongPlayerProps = {
   setVolumeLevel: Dispatch<SetStateAction<number>>;
   volumeLevel: number;
   currentChordPosition: number;
+  editModeIndex: number;
+  setEditModeIndex: Dispatch<SetStateAction<number>>;
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
@@ -53,6 +59,8 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     setVolumeLevel,
     volumeLevel,
     currentChordPosition,
+    editModeIndex,
+    setEditModeIndex,
   } = songPlayerProps;
 
   return (
@@ -72,6 +80,8 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
             loopOnDeck={loopOnDeck}
             queueProgressionCallback={queueProgressionCallback}
             currentChordPosition={currentChordPosition}
+            editModeIndex={editModeIndex}
+            setEditModeIndex={setEditModeIndex}
           />
           <Sequencer
             tracks={createdProgressions[playingProgressionIndex].tracks}

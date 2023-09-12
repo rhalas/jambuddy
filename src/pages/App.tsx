@@ -39,6 +39,7 @@ function App() {
   const [insturmentLoops, setInstrumentLoops] = useState<Array<Tone.Loop>>([]);
   const [volumeLevel, setVolumeLevel] = useState<number>(0);
   const [currentChordPosition, setCurrentChordPosition] = useState<number>(0);
+  const [editModeIndex, setEditModeIndex] = useState<number>(-1);
 
   useEffect(() => {
     if (createdProgressions.length === 0) {
@@ -77,7 +78,12 @@ function App() {
   }, [nextProgressionIndex, createdProgressions]);
 
   const makeNewSong = useCallback(
-    async (newLoopType: NewLoopType) => {
+    async (
+      newLoopType: NewLoopType,
+      progressionUpdateIndex?: number,
+      newMode?: string,
+      newRoot?: string
+    ) => {
       if (songSynths) {
         if (newLoopType === "random_key") {
           const newProgressionDetail = generateNewProgression();
@@ -103,6 +109,34 @@ function App() {
           const newProgressionDetail =
             createdProgressions[playingProgressionIndex];
           setCreatedProgressions((s) => [...s, newProgressionDetail]);
+        } else if (newLoopType === "update_existing") {
+          if (
+            progressionUpdateIndex !== undefined &&
+            progressionUpdateIndex >= 0 &&
+            (newMode !== undefined || newRoot !== undefined)
+          ) {
+            const currProgression = createdProgressions[progressionUpdateIndex];
+
+            const updatedRoot =
+              newRoot !== undefined ? newRoot : currProgression.rootNote;
+            const updatedMode =
+              newMode !== undefined ? newMode : currProgression.mode;
+
+            const newProgressionDetail = generateNewProgression(
+              updatedRoot,
+              updatedMode
+            );
+
+            const newSongInfo = await createSongTracks(
+              newProgressionDetail,
+              songSynths
+            );
+            newProgressionDetail.tracks = Object.values(newSongInfo);
+
+            const updatedProgressions = [...createdProgressions];
+            updatedProgressions[progressionUpdateIndex] = newProgressionDetail;
+            setCreatedProgressions(updatedProgressions);
+          }
         }
       }
     },
@@ -135,7 +169,7 @@ function App() {
         setCurrentChordPosition(Math.floor(beatNumber / 4) % 4);
       }
 
-      if (beatNumber % 16 == 0) {
+      if (beatNumber % 16 == 0 && editModeIndex === -1) {
         if (!ranCheckThisLoop) {
           setCurrentWord(0);
           setPlayingProgressionIndex(nextProgressionIndex);
@@ -159,6 +193,7 @@ function App() {
     prepareNextLoop,
     currentWord,
     nextProgressionIndex,
+    editModeIndex,
   ]);
 
   useEffect(() => {
@@ -221,6 +256,8 @@ function App() {
             setVolumeLevel={setVolumeLevel}
             volumeLevel={volumeLevel}
             currentChordPosition={currentChordPosition}
+            editModeIndex={editModeIndex}
+            setEditModeIndex={setEditModeIndex}
           />
         </>
       )}

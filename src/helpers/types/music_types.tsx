@@ -61,3 +61,5 @@ export const chordUrls: ChordUrl = {
   F: "https://jambuddy.s3.amazonaws.com/f_major.m4a",
   G: "https://jambuddy.s3.amazonaws.com/g_major.m4a",
 };
+
+export const modes: Array<string> = ["Major", "Minor"];

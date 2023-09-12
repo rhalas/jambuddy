@@ -3,7 +3,10 @@ import { ProgressionDetails } from "../helpers/types/types";
 import { Text } from "@radix-ui/themes";
 import { ChordInfo } from "../helpers/types/types";
 import { useEffect, useRef } from "react";
-import { Cross2Icon } from "@radix-ui/react-icons";
+import { Cross2Icon, Pencil2Icon, CheckIcon } from "@radix-ui/react-icons";
+import { Dispatch, SetStateAction } from "react";
+import { ModeSelector } from "./ModeSelector";
+import { RootSelector } from "./RootSelector";
 
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -23,18 +26,23 @@ const ProgressionText = styled.div`
   margin: 0 auto;
 `;
 
+const PencilContainer = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: transparent;
+  margin-left: 5px;
+`;
+
 const CancelContainer = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
-  border-radius: 50%;
-  border: 2px solid #333;
   background-color: transparent;
+  margin-right: 5px;
 `;
 
-const ChordContainer = styled.div`
-  margin-bottom: 25px;
-`;
+const ChordContainer = styled.div``;
 
 const ChordText = styled.span<{
   isActive: boolean;
@@ -45,11 +53,20 @@ const ChordText = styled.span<{
 const ProgressionContainer = styled.div<{
   isActive: boolean;
   isOnDeck: boolean;
+  isEditing: boolean;
 }>`
   opacity: ${(p) => (p.isActive ? "1" : "0.2")};
   background-color: ${(p) =>
-    p.isActive ? "white" : p.isOnDeck ? "green" : "#D3D3D3"};
+    p.isEditing
+      ? "orange"
+      : p.isActive
+      ? "white"
+      : p.isOnDeck
+      ? "green"
+      : "#D3D3D3"};
   cursor: pointer;
+  border: groove;
+  margin-bottom: 20px;
 `;
 
 const SwiperSlideContainer = styled.div``;
@@ -61,6 +78,13 @@ type ProgressionInfoProps = {
   queueProgressionCallback: (idx: number) => void;
   loopOnDeck: number;
   currentChordPosition: number;
+  editModeIndex: number;
+  setEditModeIndex: Dispatch<SetStateAction<number>>;
+  updateLoop: (
+    progressionUpdateIndex?: number,
+    newMode?: string,
+    newRoot?: string
+  ) => void;
 };
 
 export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
@@ -71,15 +95,23 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
     loopOnDeck,
     queueProgressionCallback,
     currentChordPosition,
+    editModeIndex,
+    setEditModeIndex,
+    updateLoop,
   } = progressionInfoProps;
 
   const sliderRef = useRef<Carousel>(null);
 
   useEffect(() => {
-    if (playingIndex > 0 && sliderRef.current && sliderRef.current.state) {
+    if (
+      playingIndex > 0 &&
+      sliderRef.current &&
+      sliderRef.current.state &&
+      editModeIndex >= 0
+    ) {
       sliderRef.current.goToSlide(playingIndex);
     }
-  }, [playingIndex]);
+  }, [playingIndex, editModeIndex]);
 
   const responsive = {
     superLargeDesktop: {
@@ -102,26 +134,48 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
 
   return (
     <ProgressionInfoContainer>
-      <Carousel
-        centerMode={true}
-        responsive={responsive}
-        showDots={true}
-        ref={sliderRef}
-      >
+      <Carousel responsive={responsive} showDots={true} ref={sliderRef}>
         {progressions.map((p, i) => (
           <SwiperSlideContainer key={i}>
             <ProgressionContainer
               isActive={i === playingIndex}
               isOnDeck={i === loopOnDeck}
+              isEditing={i === editModeIndex}
               onClick={() => {
                 queueProgressionCallback(i);
               }}
             >
               <KeyInfoContainer>
+                <PencilContainer>
+                  {editModeIndex === i ? (
+                    <CheckIcon
+                      onClick={() => {
+                        setEditModeIndex(-1);
+                      }}
+                    />
+                  ) : (
+                    <Pencil2Icon
+                      onClick={() => {
+                        setEditModeIndex(i);
+                      }}
+                    />
+                  )}
+                </PencilContainer>
                 <ProgressionText>
-                  <Text>
-                    {p.rootNote} {p.mode}
-                  </Text>
+                  <RootSelector
+                    currentRoot={p.rootNote}
+                    editModeEnabled={editModeIndex === i}
+                    setNewRoot={(root: string) => {
+                      updateLoop(i, "", root);
+                    }}
+                  />
+                  <ModeSelector
+                    currentMode={p.mode}
+                    editModeEnabled={editModeIndex === i}
+                    setNewMode={(mode: string) => {
+                      updateLoop(i, mode);
+                    }}
+                  />
                 </ProgressionText>
                 <CancelContainer>
                   <Cross2Icon
