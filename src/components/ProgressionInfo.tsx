@@ -50,6 +50,10 @@ const ChordText = styled.span<{
   background-color: ${(p) => (p.isActive ? `var(--accent-6)` : "")};
 `;
 
+const CarouselContainer = styled(Carousel)`
+  overflow: inherit;
+`;
+
 const ProgressionContainer = styled.div<{
   isActive: boolean;
   isOnDeck: boolean;
@@ -134,7 +138,11 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
 
   return (
     <ProgressionInfoContainer>
-      <Carousel responsive={responsive} showDots={true} ref={sliderRef}>
+      <CarouselContainer
+        responsive={responsive}
+        showDots={true}
+        ref={sliderRef}
+      >
         {progressions.map((p, i) => (
           <SwiperSlideContainer key={i}>
             <ProgressionContainer
@@ -227,7 +235,7 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
             </ProgressionContainer>
           </SwiperSlideContainer>
         ))}
-      </Carousel>
+      </CarouselContainer>
     </ProgressionInfoContainer>
   );
 };

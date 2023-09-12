@@ -43,10 +43,12 @@ const DropdownCheckboxItem = styled(DropdownMenu.CheckboxItem)`
   }
 `;
 
+const RootContainer = styled.span``;
+
 export const RootSelector = (modeSelectorProps: rootSelectorProps) => {
   const { currentRoot, setNewRoot, editModeEnabled } = modeSelectorProps;
   return editModeEnabled ? (
-    <span>
+    <RootContainer>
       <DropdownRoot>
         <DropDownTrigger>
           {` ${currentRoot}`}
@@ -66,8 +68,8 @@ export const RootSelector = (modeSelectorProps: rootSelectorProps) => {
           })}
         </DropDownContent>
       </DropdownRoot>
-    </span>
+    </RootContainer>
   ) : (
-    <span>{` ${currentRoot}`}</span>
+    <RootContainer>{` ${currentRoot}`}</RootContainer>
   );
 };
