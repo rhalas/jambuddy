@@ -34,10 +34,18 @@ const DropdownCheckboxItem = styled(DropdownMenu.CheckboxItem)`
   }
 `;
 
+const RootContainer = styled.span`
+  div[data-radix-popper-content-wrapper] {
+    position: absolute !important;
+    left: 73% !important;
+    transform: translateX(-50%) !important;
+  }
+`;
+
 export const ModeSelector = (modeSelectorProps: modeSelectorProps) => {
   const { currentMode, setNewMode, editModeEnabled } = modeSelectorProps;
   return editModeEnabled ? (
-    <span>
+    <RootContainer>
       <DropdownMenu.Root>
         <DropDownTrigger>
           {` ${currentMode}`}
@@ -57,8 +65,8 @@ export const ModeSelector = (modeSelectorProps: modeSelectorProps) => {
           })}
         </DropDownContent>
       </DropdownMenu.Root>
-    </span>
+    </RootContainer>
   ) : (
-    <span>{` ${currentMode}`}</span>
+    <RootContainer>{` ${currentMode}`}</RootContainer>
   );
 };

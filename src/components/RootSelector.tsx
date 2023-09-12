@@ -43,7 +43,13 @@ const DropdownCheckboxItem = styled(DropdownMenu.CheckboxItem)`
   }
 `;
 
-const RootContainer = styled.span``;
+const RootContainer = styled.span`
+  div[data-radix-popper-content-wrapper] {
+    position: absolute !important;
+    left: 55% !important;
+    transform: translateX(-50%) !important;
+  }
+`;
 
 export const RootSelector = (modeSelectorProps: rootSelectorProps) => {
   const { currentRoot, setNewRoot, editModeEnabled } = modeSelectorProps;

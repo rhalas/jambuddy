@@ -87,7 +87,7 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
           editModeIndex={editModeIndex}
           setEditModeIndex={setEditModeIndex}
           updateLoop={(
-            progressionIdx: number,
+            progressionIdx?: number,
             newMode?: string,
             newRoot?: string
           ) => {
