@@ -70,6 +70,14 @@ export const makeLeadSynth = (masterVol: Tone.Volume): TrackSynth => {
   const fft = new Tone.FFT(64);
   const vol = new Tone.Volume(DEFAULT_TRACK_VOLUME).connect(masterVol);
 
+  const chorus = new Tone.Chorus({
+    frequency: 1.5,
+    delayTime: 3.5,
+    depth: 0.7,
+    type: "sine",
+    spread: 180,
+  }).connect(vol);
+
   const newLeadSynth = new Tone.PolySynth(Tone.Synth, {
     volume: 0,
     oscillator: {
@@ -78,7 +86,7 @@ export const makeLeadSynth = (masterVol: Tone.Volume): TrackSynth => {
     portamento: 0.005,
   })
     .fan(meter, fft)
-    .connect(vol);
+    .connect(chorus);
 
   return {
     polySynth: newLeadSynth,
@@ -123,7 +131,7 @@ export const makeRhythmSynth = (masterVol: Tone.Volume): TrackSynth => {
 
   const newRhythmSynth = new Tone.PolySynth(Tone.Synth).fan(meter, fft);
   newRhythmSynth.set({
-    volume: 3,
+    volume: 8,
     oscillator: {
       type: "fatsine9",
     },
@@ -133,7 +141,15 @@ export const makeRhythmSynth = (masterVol: Tone.Volume): TrackSynth => {
     decay: 10.0,
     preDelay: 0.01,
   }).connect(vol);
-  newRhythmSynth.connect(reverb);
+
+  const tremolo = new Tone.Tremolo({
+    frequency: 10,
+    type: "sine",
+    depth: 0.5,
+    spread: 180,
+  }).connect(reverb);
+
+  newRhythmSynth.connect(tremolo);
 
   return {
     polySynth: newRhythmSynth,

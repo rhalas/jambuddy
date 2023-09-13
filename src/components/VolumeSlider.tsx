@@ -18,13 +18,13 @@ export const VolumeSlider = (volumeSliderProps: VolumeSliderProps) => {
 
   return (
     <SliderContainer>
-      Volume: {volumeLevel + 40}
+      Volume: {volumeLevel + 50}
       <Slider
-        defaultValue={[40]}
-        max={80}
+        defaultValue={[50]}
+        max={100}
         step={1}
         onValueChange={(val: number[]) => {
-          setVolumeLevel(val[0] - 40);
+          setVolumeLevel(val[0] - 50);
         }}
       />
     </SliderContainer>

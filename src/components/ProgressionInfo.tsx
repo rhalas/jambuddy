@@ -3,7 +3,7 @@ import { ProgressionDetails } from "../helpers/types/types";
 import { Text } from "@radix-ui/themes";
 import { ChordInfo } from "../helpers/types/types";
 import { useEffect, useRef } from "react";
-import { Cross2Icon, Pencil2Icon, CheckIcon } from "@radix-ui/react-icons";
+import { Pencil2Icon, CheckIcon } from "@radix-ui/react-icons";
 import { Dispatch, SetStateAction } from "react";
 import { ModeSelector } from "./ModeSelector";
 import { RootSelector } from "./RootSelector";
@@ -32,14 +32,6 @@ const PencilContainer = styled.div`
   cursor: pointer;
   background-color: transparent;
   margin-left: 5px;
-`;
-
-const CancelContainer = styled.div`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  background-color: transparent;
-  margin-right: 5px;
 `;
 
 const ChordContainer = styled.div``;
@@ -95,7 +87,6 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
   const {
     progressions,
     playingIndex,
-    deleteProgressionCallback,
     loopOnDeck,
     queueProgressionCallback,
     currentChordPosition,
@@ -185,13 +176,6 @@ export const ProgressionInfo = (progressionInfoProps: ProgressionInfoProps) => {
                     }}
                   />
                 </ProgressionText>
-                <CancelContainer>
-                  <Cross2Icon
-                    onClick={() => {
-                      deleteProgressionCallback(i);
-                    }}
-                  />
-                </CancelContainer>
               </KeyInfoContainer>
               <ChordContainer>
                 <Text>

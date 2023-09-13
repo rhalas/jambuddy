@@ -259,7 +259,7 @@ const generateGuitarRhythmTrack = async (
   newGuitarRhythmTrack.synth.samplePlayers = {};
 
   for (let i = 0; i < chordsToFetch.length; i++) {
-    const newPlayer = new Tone.Player().fan(meter, fft).connect(masterVol);
+    const newPlayer = new Tone.Player().fan(meter, fft).connect(vol);
     const listOfChords = Object.keys(chordUrls);
     if (listOfChords.includes(chordsToFetch[i])) {
       await newPlayer.load(chordUrls[chordsToFetch[i]]);
