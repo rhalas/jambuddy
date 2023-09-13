@@ -171,7 +171,6 @@ function App() {
 
       if (beatNumber % 16 == 0 && editModeIndex === -1) {
         if (!ranCheckThisLoop) {
-          setCurrentWord(0);
           setPlayingProgressionIndex(nextProgressionIndex);
 
           if (nextProgressionIndex === createdProgressions.length - 1) {
