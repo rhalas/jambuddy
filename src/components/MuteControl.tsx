@@ -20,7 +20,7 @@ export const MuteControl = (volumeSliderProps: MuteControlProps) => {
   return (
     <ButtonContainer
       onClick={() => {
-        trackVolume.volume.value = trackMuted ? 0 : -50;
+        trackVolume.volume.value = trackMuted ? 0 : -1000;
         muteCallback();
       }}
     >
