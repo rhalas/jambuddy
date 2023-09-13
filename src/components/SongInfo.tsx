@@ -55,6 +55,8 @@ type SongInfoProps = {
   currentChordPosition: number;
   editModeIndex: number;
   setEditModeIndex: Dispatch<SetStateAction<number>>;
+  activeMidiDevice: number;
+  setActiveMidiDevice: Dispatch<SetStateAction<number>>;
 };
 
 export const SongInfo = (songInfoProps: SongInfoProps) => {
@@ -72,6 +74,8 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
     currentChordPosition,
     editModeIndex,
     setEditModeIndex,
+    setActiveMidiDevice,
+    activeMidiDevice,
   } = songInfoProps;
 
   return (
@@ -157,9 +161,13 @@ export const SongInfo = (songInfoProps: SongInfoProps) => {
               <DropDownContent>
                 {midiOutputs.map((outputDevice, index) => {
                   return (
-                    <DropdownCheckboxItem checked={index == 0} key={index}>
+                    <DropdownCheckboxItem
+                      checked={index == activeMidiDevice}
+                      key={index}
+                      onClick={() => setActiveMidiDevice(index)}
+                    >
                       <DropdownMenu.ItemIndicator>
-                        <CheckIcon />
+                        {activeMidiDevice === index && <CheckIcon />}
                       </DropdownMenu.ItemIndicator>
                       {outputDevice.name}
                     </DropdownCheckboxItem>

@@ -40,6 +40,7 @@ function App() {
   const [volumeLevel, setVolumeLevel] = useState<number>(0);
   const [currentChordPosition, setCurrentChordPosition] = useState<number>(0);
   const [editModeIndex, setEditModeIndex] = useState<number>(-1);
+  const [activeMidiDevice, setActiveMidiDevice] = useState<number>(0);
 
   useEffect(() => {
     if (createdProgressions.length === 0) {
@@ -58,7 +59,7 @@ function App() {
       const newLoops: Array<Tone.Loop> = newTracks.map((track, index) => {
         return makeTrackLoop(
           track,
-          midiOutputs[1],
+          midiOutputs[activeMidiDevice],
           index + 1,
           setCurrentWord,
           lyrics
@@ -70,7 +71,13 @@ function App() {
       });
       setInstrumentLoops(newLoops);
     },
-    [lyrics, insturmentLoops, midiOutputs, createdProgressions]
+    [
+      lyrics,
+      insturmentLoops,
+      midiOutputs,
+      createdProgressions,
+      activeMidiDevice,
+    ]
   );
 
   useEffect(() => {
@@ -257,6 +264,8 @@ function App() {
             currentChordPosition={currentChordPosition}
             editModeIndex={editModeIndex}
             setEditModeIndex={setEditModeIndex}
+            setActiveMidiDevice={setActiveMidiDevice}
+            activeMidiDevice={activeMidiDevice}
           />
         </>
       )}

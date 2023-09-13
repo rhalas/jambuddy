@@ -39,6 +39,8 @@ type SongPlayerProps = {
   currentChordPosition: number;
   editModeIndex: number;
   setEditModeIndex: Dispatch<SetStateAction<number>>;
+  activeMidiDevice: number;
+  setActiveMidiDevice: Dispatch<SetStateAction<number>>;
 };
 
 export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
@@ -61,6 +63,8 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
     currentChordPosition,
     editModeIndex,
     setEditModeIndex,
+    setActiveMidiDevice,
+    activeMidiDevice,
   } = songPlayerProps;
 
   return (
@@ -82,6 +86,8 @@ export const SongPlayer = (songPlayerProps: SongPlayerProps) => {
             currentChordPosition={currentChordPosition}
             editModeIndex={editModeIndex}
             setEditModeIndex={setEditModeIndex}
+            setActiveMidiDevice={setActiveMidiDevice}
+            activeMidiDevice={activeMidiDevice}
           />
           <Sequencer
             tracks={createdProgressions[playingProgressionIndex].tracks}
