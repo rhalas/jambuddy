@@ -8,7 +8,11 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Output } from "webmidi";
 import { Dispatch, SetStateAction } from "react";
 
-const SongInfoContainer = styled.div``;
+const SongInfoContainer = styled.div`
+  overflow-x: hidden;
+  height: 175px;
+`;
+
 const MidiOutputContainer = styled(Button)`
   padding: 0;
 `;
