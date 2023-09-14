@@ -1,5 +1,5 @@
 import { Slider } from "@radix-ui/themes";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styled from "styled-components";
 
 type VolumeSliderProps = {
@@ -15,16 +15,31 @@ const SliderContainer = styled.div`
 
 export const VolumeSlider = (volumeSliderProps: VolumeSliderProps) => {
   const { volumeLevel, setVolumeLevel } = volumeSliderProps;
+  const [displayVolume, setDisplayVolume] = useState<string>("");
+
+  useEffect(() => {
+    if (volumeLevel <= -40) {
+      setDisplayVolume("0");
+    } else {
+      setDisplayVolume(`${volumeLevel + 40}`);
+    }
+  }, [volumeLevel, setDisplayVolume]);
+
+  useEffect(() => {
+    if (volumeLevel <= -40) {
+      setVolumeLevel(-1000);
+    }
+  }, [volumeLevel, setVolumeLevel]);
 
   return (
     <SliderContainer>
-      Volume: {volumeLevel + 50}
+      Volume: {displayVolume}
       <Slider
-        defaultValue={[50]}
+        defaultValue={[40]}
         max={100}
         step={1}
         onValueChange={(val: number[]) => {
-          setVolumeLevel(val[0] - 50);
+          setVolumeLevel(val[0] - 40);
         }}
       />
     </SliderContainer>
