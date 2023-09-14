@@ -37,7 +37,7 @@ function App() {
   const [promptDone, setPromptDone] = useState<boolean>(false);
 
   const [insturmentLoops, setInstrumentLoops] = useState<Array<Tone.Loop>>([]);
-  const [volumeLevel, setVolumeLevel] = useState<number>(-11);
+  const [volumeLevel, setVolumeLevel] = useState<number>(-10);
   const [currentChordPosition, setCurrentChordPosition] = useState<number>(0);
   const [editModeIndex, setEditModeIndex] = useState<number>(-1);
   const [activeMidiDevice, setActiveMidiDevice] = useState<number>(0);
