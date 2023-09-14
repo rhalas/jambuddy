@@ -12,7 +12,7 @@ export const BEATS_PER_BAR = 4;
 export const NUMBER_OF_BEATS = 16;
 export const NUMBER_OF_BARS = NUMBER_OF_BEATS / BEATS_PER_BAR;
 
-export const MAX_TEMPO = 120;
+export const MAX_TEMPO = 160;
 export const MIN_TEMPO = 160;
 
 export const BEAT_LENGTHS = ["1", "0.5"];
