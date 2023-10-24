@@ -1,10 +1,12 @@
 # JamBuddy
 
+Demo: [https://jambuddy.vercel.app/](https://jambuddy.vercel.app/)
+
 An app to generate full songs with minimal user input.
 
 To start with, the user is given the option to generate song lyrics based on a topic of their choice. This creation is powered by an API running [nanana](https://github.com/rhalas/nanana) which generates a request to OpenAI to write a custom set of lyrics.
 
-After this, we pick a random key and generate a random diatonic chord progression as the basis for the song. Using this progression we can then generate a set of tracks (melody, vocals, bass) using random notes and durations from the selected scale. A set of instruments are created using Tone.js which are used to play the newly created sounds.
+Once we have lyrics, we pick a random key and generate a random diatonic chord progression as the basis for the song. Using this progression we can then generate a set of tracks (melody, vocals, bass) using random notes and durations from the selected scale. A set of instruments are created using Tone.js which are used to play the newly created sounds.
 
 Some other features include:
 
